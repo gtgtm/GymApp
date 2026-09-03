@@ -13,6 +13,7 @@ import {
   Hourglass,
   Receipt,
   Wrench,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,6 +30,7 @@ const NAV_ITEMS: { href: string; label: string; icon: typeof LayoutDashboard; ke
   { href: "/attendance", label: "Attendance", icon: CalendarCheck, key: "attendance" },
   { href: "/expenses", label: "Expenses", icon: Receipt, key: "expenses" },
   { href: "/equipment", label: "Equipment", icon: Wrench, key: "equipment" },
+  { href: "/reports", label: "Reports", icon: BarChart3, key: "reports" },
 ];
 
 export function Sidebar() {

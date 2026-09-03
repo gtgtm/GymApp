@@ -8,13 +8,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreEnquiryRequest;
 use App\Http\Requests\Api\V1\UpdateEnquiryRequest;
 use App\Models\Enquiry;
+use App\Models\GymNotification;
+use App\Models\Role;
+use App\Models\User;
+use App\Notifications\NotificationMessage;
 use App\Services\AuditLogService;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class EnquiryController extends Controller
 {
-    public function __construct(private readonly AuditLogService $auditLog) {}
+    public function __construct(
+        private readonly AuditLogService $auditLog,
+        private readonly NotificationService $notificationService,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -41,6 +49,23 @@ class EnquiryController extends Controller
         ]);
 
         $this->auditLog->log('enquiry.created', $enquiry, null, $enquiry->toArray());
+
+        $admins = User::query()
+            ->where('gym_id', $enquiry->gym_id)
+            ->whereHas('role', fn ($query) => $query->where('name', Role::ADMIN))
+            ->get();
+
+        foreach ($admins as $admin) {
+            $this->notificationService->notify(
+                $admin,
+                new NotificationMessage(
+                    type: GymNotification::TYPE_NEW_ENQUIRY,
+                    title: "New enquiry: {$enquiry->name}",
+                    body: "{$enquiry->mobile}".($enquiry->source ? " via {$enquiry->source}" : ''),
+                    data: ['enquiry_id' => $enquiry->id],
+                ),
+            );
+        }
 
         return $this->success($enquiry, status: 201);
     }

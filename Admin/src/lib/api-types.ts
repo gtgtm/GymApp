@@ -303,3 +303,75 @@ export interface Equipment {
   last_maintenance_date: string | null;
   next_maintenance_date: string | null;
 }
+
+export interface GymNotification {
+  id: number;
+  type: string;
+  title: string;
+  body: string | null;
+  data: Record<string, unknown> | null;
+  channel: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface AiSuggestion {
+  category: string;
+  message: string;
+  action_label: string;
+  action_route: string;
+  severity: "info" | "warning" | "success" | "danger";
+}
+
+export interface FinancialReport {
+  summary: {
+    from: string;
+    to: string;
+    revenue: number;
+    expenses: number;
+    profit: number;
+    payment_method_breakdown: Record<string, string>;
+    expense_category_breakdown: Record<string, string>;
+  };
+  daily_revenue: Array<{ date: string; total: number }>;
+}
+
+export interface MembersReport {
+  summary: {
+    from: string;
+    to: string;
+    new_members: number;
+    active_members: number;
+    expired_members: number;
+    renewals: number;
+    churn_rate: number;
+  };
+  plan_distribution: Array<{ plan_name: string; count: number }>;
+}
+
+export interface AttendanceReport {
+  daily: Array<{ date: string; count: number }>;
+  by_day_of_week: Array<{ day: string; count: number }>;
+  member_wise: Array<{ member: string; member_code: string; visits: number }>;
+}
+
+export interface TrainerReportRow {
+  trainer: string;
+  assigned_members: number;
+  workout_plans_created: number;
+  diet_plans_created: number;
+}
+
+export interface SalesReport {
+  summary: {
+    from: string;
+    to: string;
+    leads: number;
+    converted_leads: number;
+    conversion_rate: number;
+    trials: number;
+    trials_converted: number;
+    trial_conversion_rate: number;
+  };
+  revenue_by_plan: Array<{ plan: string; sold_count: number; estimated_revenue: number }>;
+}

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\AiSuggestionController;
 use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\BodyMeasurementController;
 use App\Http\Controllers\Api\V1\DashboardController;
@@ -10,8 +11,10 @@ use App\Http\Controllers\Api\V1\EquipmentController;
 use App\Http\Controllers\Api\V1\ExpenseController;
 use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MembershipPlanController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ProgressPhotoController;
+use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\TrainerController;
 use App\Http\Controllers\Api\V1\TrialController;
 use App\Http\Controllers\Api\V1\WorkoutPlanController;
@@ -24,6 +27,10 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('me', [AuthController::class, 'me']);
 
     Route::get('dashboard', [DashboardController::class, 'index']);
+
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::put('notifications/{notification}/read', [NotificationController::class, 'markRead']);
+    Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
 
     // Staff-only surface: admin, receptionist, trainer. Member-portal scoping
     // (a member seeing only their own records) is introduced in a later phase
@@ -60,6 +67,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
         Route::apiResource('trials', TrialController::class);
         Route::get('trials-expiring-soon', [TrialController::class, 'expiringSoon']);
+
+        Route::get('ai/suggestions', [AiSuggestionController::class, 'index']);
     });
 
     Route::middleware('role:admin')->group(function (): void {
@@ -75,5 +84,23 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
         Route::apiResource('equipment', EquipmentController::class);
         Route::get('equipment-maintenance-due', [EquipmentController::class, 'maintenanceDue']);
+
+        Route::prefix('reports')->group(function (): void {
+            Route::get('financial', [ReportController::class, 'financial']);
+            Route::get('financial/export/csv', [ReportController::class, 'financialExportCsv']);
+            Route::get('financial/export/pdf', [ReportController::class, 'financialExportPdf']);
+
+            Route::get('members', [ReportController::class, 'members']);
+            Route::get('members/export/csv', [ReportController::class, 'membersExportCsv']);
+
+            Route::get('attendance', [ReportController::class, 'attendance']);
+            Route::get('attendance/export/csv', [ReportController::class, 'attendanceExportCsv']);
+
+            Route::get('trainers', [ReportController::class, 'trainers']);
+            Route::get('trainers/export/csv', [ReportController::class, 'trainersExportCsv']);
+
+            Route::get('sales', [ReportController::class, 'sales']);
+            Route::get('sales/export/csv', [ReportController::class, 'salesExportCsv']);
+        });
     });
 });

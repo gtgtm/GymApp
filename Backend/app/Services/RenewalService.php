@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\GymNotification;
 use App\Models\Member;
 use App\Models\Membership;
 use App\Models\MembershipPlan;
 use App\Models\MembershipRenewal;
+use App\Notifications\NotificationMessage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class RenewalService
 {
-    public function __construct(private readonly PaymentService $paymentService) {}
+    public function __construct(
+        private readonly PaymentService $paymentService,
+        private readonly NotificationService $notificationService,
+    ) {}
 
     public function renew(Member $member, MembershipPlan $plan, array $data): MembershipRenewal
     {
@@ -60,6 +65,18 @@ class RenewalService
                 'tax' => $data['tax'] ?? 0,
                 'method' => $data['payment_method'],
             ]);
+
+            if (auth()->user()) {
+                $this->notificationService->notify(
+                    auth()->user(),
+                    new NotificationMessage(
+                        type: GymNotification::TYPE_RENEWAL_CONFIRMATION,
+                        title: "Membership renewed for {$member->full_name}",
+                        body: "New expiry: {$newExpiry->toDateString()}.",
+                        data: ['member_id' => $member->id, 'renewal_id' => $renewal->id],
+                    ),
+                );
+            }
 
             return $renewal;
         });

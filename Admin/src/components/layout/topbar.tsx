@@ -1,15 +1,21 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 
+const NotificationBell = dynamic(
+  () => import("@/components/layout/notification-bell").then((mod) => mod.NotificationBell),
+  { ssr: false },
+);
+
 export function Topbar() {
   const { user, logout } = useAuth();
 
   const initials = user?.name
-    .split(" ")
+    ?.split(" ")
     .map((part) => part[0])
     .join("")
     .slice(0, 2)
@@ -21,6 +27,7 @@ export function Topbar() {
         <p className="text-sm text-muted-foreground">{user?.gym.name}</p>
       </div>
       <div className="flex items-center gap-3">
+        <NotificationBell />
         <div className="text-right">
           <p className="text-sm font-medium leading-none">{user?.name}</p>
           <p className="text-xs text-muted-foreground capitalize">{user?.role.label}</p>

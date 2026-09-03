@@ -5,6 +5,7 @@ import { useDashboard } from "@/hooks/use-dashboard";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { ExpiryBuckets } from "@/components/dashboard/expiry-buckets";
+import { SmartSuggestions } from "@/components/dashboard/smart-suggestions";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function ReceptionistDashboard() {
@@ -27,6 +28,8 @@ export function ReceptionistDashboard() {
       <h1 className="text-2xl font-semibold tracking-tight">Front Desk Dashboard</h1>
 
       <QuickActions exclude={["/plans?new=1", "/expenses?new=1"]} />
+
+      <SmartSuggestions />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Members" value={summary.total_members} icon={Users} />
