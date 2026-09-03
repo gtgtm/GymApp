@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Requests\Api\V1;
+
+class UpdateMemberRequest extends StoreMemberRequest
+{
+    public function rules(): array
+    {
+        $rules = parent::rules();
+        $rules['full_name'] = ['sometimes', 'string', 'max:255'];
+        $rules['mobile'] = ['sometimes', 'string', 'max:20'];
+        $rules['joining_date'] = ['sometimes', 'date'];
+
+        return $rules;
+    }
+}

@@ -1,0 +1,56 @@
+# macOS
+.DS_Store
+
+# Claude Code local settings
+.claude/
+
+# Laravel (Backend)
+Backend/vendor/
+Backend/.env
+Backend/.env.backup
+Backend/.phpunit.result.cache
+Backend/storage/*.key
+Backend/storage/app/*
+!Backend/storage/app/.gitkeep
+Backend/storage/framework/cache/*
+!Backend/storage/framework/cache/.gitkeep
+Backend/storage/framework/sessions/*
+!Backend/storage/framework/sessions/.gitkeep
+Backend/storage/framework/views/*
+!Backend/storage/framework/views/.gitkeep
+Backend/storage/logs/*
+!Backend/storage/logs/.gitkeep
+Backend/bootstrap/cache/*
+!Backend/bootstrap/cache/.gitignore
+Backend/public/hot
+Backend/public/storage
+Backend/auth.json
+
+# Node (Admin)
+Admin/node_modules/
+Admin/.next/
+Admin/out/
+Admin/.env*.local
+Admin/.env
+Admin/npm-debug.log*
+Admin/yarn-debug.log*
+Admin/yarn-error.log*
+
+# Flutter (MobileApp)
+MobileApp/.dart_tool/
+MobileApp/.flutter-plugins
+MobileApp/.flutter-plugins-dependencies
+MobileApp/.packages
+MobileApp/build/
+MobileApp/ios/Pods/
+MobileApp/ios/.symlinks/
+MobileApp/ios/Flutter/Flutter.framework
+MobileApp/ios/Flutter/Flutter.podspec
+MobileApp/android/.gradle/
+MobileApp/android/local.properties
+MobileApp/.idea/
+
+# IDE
+.idea/
+.vscode/
+*.iml
