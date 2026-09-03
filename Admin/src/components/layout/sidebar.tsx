@@ -11,18 +11,22 @@ import {
   Dumbbell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
+import { canAccessNav, type NavKey } from "@/lib/permissions";
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/members", label: "Members", icon: Users },
-  { href: "/trainers", label: "Trainers", icon: Dumbbell },
-  { href: "/plans", label: "Membership Plans", icon: ClipboardList },
-  { href: "/payments", label: "Payments", icon: CreditCard },
-  { href: "/attendance", label: "Attendance", icon: CalendarCheck },
-] as const;
+const NAV_ITEMS: { href: string; label: string; icon: typeof LayoutDashboard; key: NavKey }[] = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, key: "dashboard" },
+  { href: "/members", label: "Members", icon: Users, key: "members" },
+  { href: "/trainers", label: "Trainers", icon: Dumbbell, key: "trainers" },
+  { href: "/plans", label: "Membership Plans", icon: ClipboardList, key: "plans" },
+  { href: "/payments", label: "Payments", icon: CreditCard, key: "payments" },
+  { href: "/attendance", label: "Attendance", icon: CalendarCheck, key: "attendance" },
+];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const visibleItems = NAV_ITEMS.filter((item) => canAccessNav(user?.role.name, item.key));
 
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-background md:flex md:flex-col">
@@ -30,7 +34,7 @@ export function Sidebar() {
         <span className="text-lg font-semibold tracking-tight">GymApp</span>
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3">
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        {visibleItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname.startsWith(href);
           return (
             <Link

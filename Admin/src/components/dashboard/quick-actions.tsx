@@ -11,10 +11,12 @@ const ACTIONS = [
   { href: "/plans?new=1", label: "Add Plan", icon: ClipboardPlus },
 ] as const;
 
-export function QuickActions() {
+export function QuickActions({ includePlans = true }: { includePlans?: boolean }) {
+  const actions = includePlans ? ACTIONS : ACTIONS.filter((action) => action.href !== "/plans?new=1");
+
   return (
     <div className="flex flex-wrap gap-3">
-      {ACTIONS.map(({ href, label, icon: Icon }) => (
+      {actions.map(({ href, label, icon: Icon }) => (
         <Button key={href} variant="outline" nativeButton={false} render={<Link href={href} />}>
           <Icon className="h-4 w-4" />
           {label}

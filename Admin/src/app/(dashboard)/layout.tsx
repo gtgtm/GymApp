@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { canAccessRoute } from "@/lib/permissions";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -17,7 +19,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }
   }, [isLoading, user, router]);
 
-  if (isLoading || !user) {
+  useEffect(() => {
+    if (user && !canAccessRoute(user.role.name, pathname)) {
+      router.replace("/dashboard");
+    }
+  }, [user, pathname, router]);
+
+  const isAuthorizedForRoute = user ? canAccessRoute(user.role.name, pathname) : false;
+
+  if (isLoading || !user || !isAuthorizedForRoute) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Skeleton className="h-8 w-48" />

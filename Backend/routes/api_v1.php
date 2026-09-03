@@ -21,27 +21,42 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::get('dashboard', [DashboardController::class, 'index']);
 
-    Route::apiResource('members', MemberController::class);
-    Route::post('members/{member}/renew', [MemberController::class, 'renew']);
-    Route::get('members/{member}/payments', [MemberController::class, 'payments']);
+    // Staff-only surface: admin, receptionist, trainer. Member-portal scoping
+    // (a member seeing only their own records) is introduced in a later phase
+    // alongside the mobile app, when the `member` role actually logs in here.
+    Route::middleware('role:admin,receptionist,trainer')->group(function (): void {
+        Route::apiResource('members', MemberController::class);
+        Route::post('members/{member}/renew', [MemberController::class, 'renew']);
+        Route::get('members/{member}/payments', [MemberController::class, 'payments']);
 
-    Route::apiResource('membership-plans', MembershipPlanController::class);
+        Route::apiResource('membership-plans', MembershipPlanController::class)->only(['index', 'show']);
 
-    Route::apiResource('payments', PaymentController::class)->only(['index', 'store', 'show']);
+        Route::apiResource('payments', PaymentController::class)->only(['index', 'store', 'show']);
 
-    Route::get('attendance', [AttendanceController::class, 'index']);
-    Route::post('attendance', [AttendanceController::class, 'store']);
+        Route::get('attendance', [AttendanceController::class, 'index']);
+        Route::post('attendance', [AttendanceController::class, 'store']);
 
-    Route::apiResource('trainers', TrainerController::class);
+        Route::apiResource('trainers', TrainerController::class)->only(['index', 'show']);
 
-    Route::apiResource('workout-plans', WorkoutPlanController::class);
+        Route::apiResource('workout-plans', WorkoutPlanController::class);
 
-    Route::apiResource('diet-plans', DietPlanController::class);
+        Route::apiResource('diet-plans', DietPlanController::class);
 
-    Route::get('body-measurements', [BodyMeasurementController::class, 'index']);
-    Route::post('body-measurements', [BodyMeasurementController::class, 'store']);
+        Route::get('body-measurements', [BodyMeasurementController::class, 'index']);
+        Route::post('body-measurements', [BodyMeasurementController::class, 'store']);
 
-    Route::get('progress-photos', [ProgressPhotoController::class, 'index']);
-    Route::post('progress-photos', [ProgressPhotoController::class, 'store']);
-    Route::delete('progress-photos/{progressPhoto}', [ProgressPhotoController::class, 'destroy']);
+        Route::get('progress-photos', [ProgressPhotoController::class, 'index']);
+        Route::post('progress-photos', [ProgressPhotoController::class, 'store']);
+        Route::delete('progress-photos/{progressPhoto}', [ProgressPhotoController::class, 'destroy']);
+    });
+
+    Route::middleware('role:admin')->group(function (): void {
+        Route::apiResource('membership-plans', MembershipPlanController::class)->only([
+            'store', 'update', 'destroy',
+        ]);
+
+        Route::apiResource('trainers', TrainerController::class)->only([
+            'store', 'update', 'destroy',
+        ]);
+    });
 });
