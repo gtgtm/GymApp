@@ -38,15 +38,15 @@ export function TrainerDashboard() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button variant="outline" render={<Link href="/attendance" />}>
+        <Button variant="outline" nativeButton={false} render={<Link href="/attendance" />}>
           <CalendarCheck className="h-4 w-4" />
           Mark Attendance
         </Button>
-        <Button variant="outline" render={<Link href="/members" />}>
+        <Button variant="outline" nativeButton={false} render={<Link href="/members" />}>
           <Dumbbell className="h-4 w-4" />
           Assign Workout Plan
         </Button>
-        <Button variant="outline" render={<Link href="/members" />}>
+        <Button variant="outline" nativeButton={false} render={<Link href="/members" />}>
           <Salad className="h-4 w-4" />
           Assign Diet Plan
         </Button>
