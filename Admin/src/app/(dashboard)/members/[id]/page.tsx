@@ -9,6 +9,9 @@ import { ExpiryBadge } from "@/components/members/expiry-badge";
 import { RenewMembershipDialog } from "@/components/members/renew-membership-dialog";
 import { MemberPaymentsTab } from "@/components/members/member-payments-tab";
 import { MemberAttendanceTab } from "@/components/members/member-attendance-tab";
+import { MemberWorkoutTab } from "@/components/members/member-workout-tab";
+import { MemberDietTab } from "@/components/members/member-diet-tab";
+import { MemberProgressTab } from "@/components/members/member-progress-tab";
 
 export default function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -40,6 +43,9 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
           <TabsTrigger value="membership">Membership</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="attendance">Attendance</TabsTrigger>
+          <TabsTrigger value="workout">Workout</TabsTrigger>
+          <TabsTrigger value="diet">Diet</TabsTrigger>
+          <TabsTrigger value="progress">Progress</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -83,6 +89,18 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
 
         <TabsContent value="attendance">
           <MemberAttendanceTab memberId={memberId} />
+        </TabsContent>
+
+        <TabsContent value="workout">
+          <MemberWorkoutTab memberId={memberId} />
+        </TabsContent>
+
+        <TabsContent value="diet">
+          <MemberDietTab memberId={memberId} />
+        </TabsContent>
+
+        <TabsContent value="progress">
+          <MemberProgressTab memberId={memberId} />
         </TabsContent>
       </Tabs>
     </div>

@@ -2,10 +2,15 @@
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\AttendanceController;
+use App\Http\Controllers\Api\V1\BodyMeasurementController;
 use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\DietPlanController;
 use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MembershipPlanController;
 use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\ProgressPhotoController;
+use App\Http\Controllers\Api\V1\TrainerController;
+use App\Http\Controllers\Api\V1\WorkoutPlanController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
@@ -26,4 +31,17 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::get('attendance', [AttendanceController::class, 'index']);
     Route::post('attendance', [AttendanceController::class, 'store']);
+
+    Route::apiResource('trainers', TrainerController::class);
+
+    Route::apiResource('workout-plans', WorkoutPlanController::class);
+
+    Route::apiResource('diet-plans', DietPlanController::class);
+
+    Route::get('body-measurements', [BodyMeasurementController::class, 'index']);
+    Route::post('body-measurements', [BodyMeasurementController::class, 'store']);
+
+    Route::get('progress-photos', [ProgressPhotoController::class, 'index']);
+    Route::post('progress-photos', [ProgressPhotoController::class, 'store']);
+    Route::delete('progress-photos/{progressPhoto}', [ProgressPhotoController::class, 'destroy']);
 });

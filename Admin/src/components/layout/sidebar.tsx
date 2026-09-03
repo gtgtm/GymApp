@@ -8,12 +8,14 @@ import {
   CreditCard,
   CalendarCheck,
   ClipboardList,
+  Dumbbell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/members", label: "Members", icon: Users },
+  { href: "/trainers", label: "Trainers", icon: Dumbbell },
   { href: "/plans", label: "Membership Plans", icon: ClipboardList },
   { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/attendance", label: "Attendance", icon: CalendarCheck },

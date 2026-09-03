@@ -128,3 +128,102 @@ export interface DashboardResponse {
     member: { id: number; full_name: string; mobile: string; member_code: string };
   }>>;
 }
+
+export interface Trainer {
+  id: number;
+  gym_id: number;
+  user_id: number;
+  specialization: string | null;
+  joining_date: string | null;
+  salary: string | null;
+  status: "active" | "inactive";
+  assigned_members_count?: number;
+  user: { id: number; name: string; email: string; phone: string | null; status: string };
+  assigned_members?: Array<{ id: number; full_name: string; member_code: string }>;
+}
+
+export type MealSlot =
+  | "breakfast"
+  | "mid_morning"
+  | "lunch"
+  | "evening_snack"
+  | "dinner"
+  | "before_bed";
+
+export interface WorkoutExercise {
+  id?: number;
+  day_number: number;
+  day_label: string | null;
+  exercise_name: string;
+  muscle_group: string | null;
+  sets: number | null;
+  reps: string | null;
+  weight_kg: string | null;
+  rest_seconds: number | null;
+  instructions: string | null;
+  video_url: string | null;
+  trainer_notes: string | null;
+}
+
+export interface WorkoutPlan {
+  id: number;
+  member_id: number;
+  trainer_id: number | null;
+  name: string;
+  notes: string | null;
+  status: "active" | "inactive";
+  exercises: WorkoutExercise[];
+  trainer?: { id: number; user: { id: number; name: string } } | null;
+}
+
+export interface DietMeal {
+  id?: number;
+  meal_slot: MealSlot;
+  food_item: string;
+  quantity: string | null;
+  calories: string | null;
+  protein_g: string | null;
+  carbs_g: string | null;
+  fat_g: string | null;
+  notes: string | null;
+}
+
+export interface DietPlan {
+  id: number;
+  member_id: number;
+  trainer_id: number | null;
+  name: string;
+  notes: string | null;
+  status: "active" | "inactive";
+  meals: DietMeal[];
+  daily_summary: {
+    calories: number;
+    protein_g: number;
+    carbs_g: number;
+    fat_g: number;
+  };
+}
+
+export interface BodyMeasurement {
+  id: number;
+  member_id: number;
+  recorded_date: string;
+  weight_kg: string | null;
+  height_cm: string | null;
+  bmi: string | null;
+  body_fat_percent: string | null;
+  chest_cm: string | null;
+  waist_cm: string | null;
+  arms_cm: string | null;
+  thigh_cm: string | null;
+  hips_cm: string | null;
+}
+
+export interface ProgressPhoto {
+  id: number;
+  member_id: number;
+  url: string;
+  type: "before" | "after" | "progress";
+  taken_on: string;
+  notes: string | null;
+}

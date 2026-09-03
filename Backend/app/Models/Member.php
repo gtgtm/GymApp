@@ -69,6 +69,26 @@ class Member extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function workoutPlans(): HasMany
+    {
+        return $this->hasMany(WorkoutPlan::class);
+    }
+
+    public function dietPlans(): HasMany
+    {
+        return $this->hasMany(DietPlan::class);
+    }
+
+    public function bodyMeasurements(): HasMany
+    {
+        return $this->hasMany(BodyMeasurement::class)->orderBy('recorded_date');
+    }
+
+    public function progressPhotos(): HasMany
+    {
+        return $this->hasMany(ProgressPhoto::class)->orderBy('taken_on');
+    }
+
     public function expiryBucket(): string
     {
         $membership = $this->currentMembership();
