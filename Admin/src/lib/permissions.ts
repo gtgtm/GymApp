@@ -2,11 +2,32 @@ import type { Role } from "@/lib/api-types";
 
 export type RoleName = Role["name"];
 
-export type NavKey = "dashboard" | "members" | "trainers" | "plans" | "payments" | "attendance";
+export type NavKey =
+  | "dashboard"
+  | "members"
+  | "trainers"
+  | "plans"
+  | "payments"
+  | "attendance"
+  | "enquiries"
+  | "trials"
+  | "expenses"
+  | "equipment";
 
 const ROLE_NAV_ACCESS: Record<RoleName, NavKey[]> = {
-  admin: ["dashboard", "members", "trainers", "plans", "payments", "attendance"],
-  receptionist: ["dashboard", "members", "payments", "attendance"],
+  admin: [
+    "dashboard",
+    "members",
+    "trainers",
+    "plans",
+    "payments",
+    "attendance",
+    "enquiries",
+    "trials",
+    "expenses",
+    "equipment",
+  ],
+  receptionist: ["dashboard", "members", "payments", "attendance", "enquiries", "trials"],
   trainer: ["dashboard", "members", "attendance"],
   member: [],
 };
@@ -23,6 +44,10 @@ const ROUTE_NAV_KEY: Record<string, NavKey> = {
   "/plans": "plans",
   "/payments": "payments",
   "/attendance": "attendance",
+  "/enquiries": "enquiries",
+  "/trials": "trials",
+  "/expenses": "expenses",
+  "/equipment": "equipment",
 };
 
 export function canAccessRoute(role: RoleName | undefined, pathname: string): boolean {

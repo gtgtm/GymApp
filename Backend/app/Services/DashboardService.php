@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Attendance;
+use App\Models\Enquiry;
+use App\Models\Expense;
 use App\Models\Member;
 use App\Models\Membership;
 use App\Models\MembershipRenewal;
 use App\Models\Payment;
+use App\Models\Trainer;
 use Illuminate\Support\Carbon;
 
 class DashboardService
@@ -30,6 +33,11 @@ class DashboardService
             'todays_revenue' => (float) Payment::query()->whereDate('paid_at', $today)->sum('amount'),
             'monthly_revenue' => (float) Payment::query()->where('paid_at', '>=', $monthStart)->sum('amount'),
             'pending_payments' => (float) MembershipRenewal::query()->sum('amount_due'),
+            'monthly_expenses' => (float) Expense::query()->where('expense_date', '>=', $monthStart)->sum('amount'),
+            'monthly_net_profit' => (float) Payment::query()->where('paid_at', '>=', $monthStart)->sum('amount')
+                - (float) Expense::query()->where('expense_date', '>=', $monthStart)->sum('amount'),
+            'new_enquiries' => Enquiry::query()->where('status', Enquiry::STATUS_NEW)->count(),
+            'active_trainers' => Trainer::query()->where('status', 'active')->count(),
         ];
     }
 

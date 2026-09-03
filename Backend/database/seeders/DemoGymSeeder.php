@@ -4,12 +4,16 @@ namespace Database\Seeders;
 
 use App\Models\BodyMeasurement;
 use App\Models\DietPlan;
+use App\Models\Enquiry;
+use App\Models\Equipment;
+use App\Models\Expense;
 use App\Models\Gym;
 use App\Models\Member;
 use App\Models\Membership;
 use App\Models\MembershipPlan;
 use App\Models\Role;
 use App\Models\Trainer;
+use App\Models\Trial;
 use App\Models\User;
 use App\Models\WorkoutPlan;
 use Illuminate\Database\Seeder;
@@ -45,7 +49,7 @@ class DemoGymSeeder extends Seeder
             ],
         );
 
-        User::query()->updateOrCreate(
+        $receptionist = User::query()->updateOrCreate(
             ['email' => 'reception@demofitness.test'],
             [
                 'gym_id' => $gym->id,
@@ -205,6 +209,87 @@ class DemoGymSeeder extends Seeder
             ['gym_id' => $gym->id, 'member_id' => $firstMember->id, 'recorded_date' => $today],
             ['weight_kg' => 76, 'height_cm' => 170, 'bmi' => round(76 / (1.70 ** 2), 2), 'recorded_by' => $trainer->id],
         );
+
+        $enquiriesData = [
+            ['name' => 'Karan Mehta', 'mobile' => '9700000001', 'source' => 'Walk-in', 'status' => Enquiry::STATUS_NEW, 'plan' => $monthlyPlan, 'follow_up_in_days' => 2],
+            ['name' => 'Divya Kapoor', 'mobile' => '9700000002', 'source' => 'Instagram', 'status' => Enquiry::STATUS_CONTACTED, 'plan' => $quarterlyPlan, 'follow_up_in_days' => 1],
+            ['name' => 'Sameer Khan', 'mobile' => '9700000003', 'source' => 'Referral', 'status' => Enquiry::STATUS_TRIAL, 'plan' => $monthlyPlan, 'follow_up_in_days' => 0],
+            ['name' => 'Neha Bhatt', 'mobile' => '9700000004', 'source' => 'Google', 'status' => Enquiry::STATUS_CONVERTED, 'plan' => $yearlyPlan, 'follow_up_in_days' => null],
+            ['name' => 'Arjun Desai', 'mobile' => '9700000005', 'source' => 'Walk-in', 'status' => Enquiry::STATUS_LOST, 'plan' => $monthlyPlan, 'follow_up_in_days' => null],
+        ];
+
+        $trialEnquiry = null;
+
+        foreach ($enquiriesData as $data) {
+            $enquiry = Enquiry::query()->updateOrCreate(
+                ['gym_id' => $gym->id, 'mobile' => $data['mobile']],
+                [
+                    'name' => $data['name'],
+                    'source' => $data['source'],
+                    'interested_plan_id' => $data['plan']->id,
+                    'follow_up_date' => $data['follow_up_in_days'] !== null ? $today->copy()->addDays($data['follow_up_in_days']) : null,
+                    'assigned_staff_id' => $receptionist->id,
+                    'status' => $data['status'],
+                ],
+            );
+
+            if ($data['status'] === Enquiry::STATUS_TRIAL) {
+                $trialEnquiry = $enquiry;
+            }
+        }
+
+        Trial::query()->updateOrCreate(
+            ['gym_id' => $gym->id, 'mobile' => $trialEnquiry->mobile],
+            [
+                'enquiry_id' => $trialEnquiry->id,
+                'name' => $trialEnquiry->name,
+                'trial_start' => $today->copy()->subDays(2),
+                'trial_end' => $today->copy()->addDay(),
+                'trainer_id' => $trainerProfile->id,
+                'status' => Trial::STATUS_ACTIVE,
+            ],
+        );
+
+        $expensesData = [
+            ['category' => Expense::CATEGORY_RENT, 'amount' => 45000, 'days_ago' => 5, 'description' => 'Monthly gym floor rent'],
+            ['category' => Expense::CATEGORY_ELECTRICITY, 'amount' => 8500, 'days_ago' => 4, 'description' => 'Electricity bill'],
+            ['category' => Expense::CATEGORY_SALARY, 'amount' => 35000, 'days_ago' => 3, 'description' => 'Trainer salary'],
+            ['category' => Expense::CATEGORY_MAINTENANCE, 'amount' => 3200, 'days_ago' => 2, 'description' => 'Treadmill servicing'],
+            ['category' => Expense::CATEGORY_MARKETING, 'amount' => 2000, 'days_ago' => 1, 'description' => 'Instagram ads'],
+        ];
+
+        foreach ($expensesData as $data) {
+            Expense::query()->updateOrCreate(
+                ['gym_id' => $gym->id, 'category' => $data['category'], 'expense_date' => $today->copy()->subDays($data['days_ago'])],
+                [
+                    'amount' => $data['amount'],
+                    'description' => $data['description'],
+                    'payment_method' => 'bank_transfer',
+                    'recorded_by' => $admin->id,
+                ],
+            );
+        }
+
+        $equipmentData = [
+            ['name' => 'Treadmill #1', 'category' => 'Cardio', 'purchase_days_ago' => 400, 'price' => 85000, 'condition' => Equipment::CONDITION_GOOD, 'next_maintenance_in_days' => 20],
+            ['name' => 'Leg Press Machine', 'category' => 'Strength', 'purchase_days_ago' => 600, 'price' => 65000, 'condition' => Equipment::CONDITION_FAIR, 'next_maintenance_in_days' => 5],
+            ['name' => 'Dumbbell Set (5-50kg)', 'category' => 'Free Weights', 'purchase_days_ago' => 200, 'price' => 45000, 'condition' => Equipment::CONDITION_GOOD, 'next_maintenance_in_days' => 90],
+            ['name' => 'Rowing Machine', 'category' => 'Cardio', 'purchase_days_ago' => 800, 'price' => 55000, 'condition' => Equipment::CONDITION_NEEDS_REPAIR, 'next_maintenance_in_days' => -2],
+        ];
+
+        foreach ($equipmentData as $data) {
+            Equipment::query()->updateOrCreate(
+                ['gym_id' => $gym->id, 'name' => $data['name']],
+                [
+                    'category' => $data['category'],
+                    'purchase_date' => $today->copy()->subDays($data['purchase_days_ago']),
+                    'purchase_price' => $data['price'],
+                    'condition' => $data['condition'],
+                    'last_maintenance_date' => $today->copy()->subDays(90),
+                    'next_maintenance_date' => $today->copy()->addDays($data['next_maintenance_in_days']),
+                ],
+            );
+        }
 
         auth()->logout();
     }

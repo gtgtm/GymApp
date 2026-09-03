@@ -5,11 +5,15 @@ use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\BodyMeasurementController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\DietPlanController;
+use App\Http\Controllers\Api\V1\EnquiryController;
+use App\Http\Controllers\Api\V1\EquipmentController;
+use App\Http\Controllers\Api\V1\ExpenseController;
 use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MembershipPlanController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ProgressPhotoController;
 use App\Http\Controllers\Api\V1\TrainerController;
+use App\Http\Controllers\Api\V1\TrialController;
 use App\Http\Controllers\Api\V1\WorkoutPlanController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +54,14 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::delete('progress-photos/{progressPhoto}', [ProgressPhotoController::class, 'destroy']);
     });
 
+    Route::middleware('role:admin,receptionist')->group(function (): void {
+        Route::apiResource('enquiries', EnquiryController::class);
+        Route::get('enquiries-stats/conversion', [EnquiryController::class, 'conversionStats']);
+
+        Route::apiResource('trials', TrialController::class);
+        Route::get('trials-expiring-soon', [TrialController::class, 'expiringSoon']);
+    });
+
     Route::middleware('role:admin')->group(function (): void {
         Route::apiResource('membership-plans', MembershipPlanController::class)->only([
             'store', 'update', 'destroy',
@@ -58,5 +70,10 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::apiResource('trainers', TrainerController::class)->only([
             'store', 'update', 'destroy',
         ]);
+
+        Route::apiResource('expenses', ExpenseController::class);
+
+        Route::apiResource('equipment', EquipmentController::class);
+        Route::get('equipment-maintenance-due', [EquipmentController::class, 'maintenanceDue']);
     });
 });

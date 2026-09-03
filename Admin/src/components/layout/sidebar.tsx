@@ -9,6 +9,10 @@ import {
   CalendarCheck,
   ClipboardList,
   Dumbbell,
+  UserSearch,
+  Hourglass,
+  Receipt,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -17,10 +21,14 @@ import { canAccessNav, type NavKey } from "@/lib/permissions";
 const NAV_ITEMS: { href: string; label: string; icon: typeof LayoutDashboard; key: NavKey }[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, key: "dashboard" },
   { href: "/members", label: "Members", icon: Users, key: "members" },
+  { href: "/enquiries", label: "Enquiries", icon: UserSearch, key: "enquiries" },
+  { href: "/trials", label: "Trials", icon: Hourglass, key: "trials" },
   { href: "/trainers", label: "Trainers", icon: Dumbbell, key: "trainers" },
   { href: "/plans", label: "Membership Plans", icon: ClipboardList, key: "plans" },
   { href: "/payments", label: "Payments", icon: CreditCard, key: "payments" },
   { href: "/attendance", label: "Attendance", icon: CalendarCheck, key: "attendance" },
+  { href: "/expenses", label: "Expenses", icon: Receipt, key: "expenses" },
+  { href: "/equipment", label: "Equipment", icon: Wrench, key: "equipment" },
 ];
 
 export function Sidebar() {

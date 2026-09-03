@@ -1,6 +1,16 @@
 "use client";
 
-import { Users, UserCheck, CalendarDays, IndianRupee, Wallet, UserPlus } from "lucide-react";
+import {
+  Users,
+  UserCheck,
+  CalendarDays,
+  IndianRupee,
+  Wallet,
+  UserPlus,
+  TrendingUp,
+  UserSearch,
+  Dumbbell,
+} from "lucide-react";
 import { useDashboard } from "@/hooks/use-dashboard";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { QuickActions } from "@/components/dashboard/quick-actions";
@@ -70,6 +80,14 @@ export function AdminDashboard() {
           icon={Wallet}
           tone="warning"
         />
+        <StatCard
+          label="Net Profit (This Month)"
+          value={`₹${summary.monthly_net_profit.toLocaleString("en-IN")}`}
+          icon={TrendingUp}
+          tone={summary.monthly_net_profit >= 0 ? "success" : "danger"}
+        />
+        <StatCard label="New Enquiries" value={summary.new_enquiries} icon={UserSearch} />
+        <StatCard label="Active Trainers" value={summary.active_trainers} icon={Dumbbell} />
       </div>
 
       <ExpiryBuckets expiring={expiring} />

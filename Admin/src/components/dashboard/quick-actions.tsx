@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { UserPlus, Wallet, CalendarCheck, ClipboardPlus } from "lucide-react";
+import {
+  UserPlus,
+  Wallet,
+  CalendarCheck,
+  ClipboardPlus,
+  UserSearch,
+  Receipt,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ACTIONS = [
@@ -9,10 +16,14 @@ const ACTIONS = [
   { href: "/payments?new=1", label: "Collect Payment", icon: Wallet },
   { href: "/attendance", label: "Mark Attendance", icon: CalendarCheck },
   { href: "/plans?new=1", label: "Add Plan", icon: ClipboardPlus },
+  { href: "/enquiries?new=1", label: "Add Enquiry", icon: UserSearch },
+  { href: "/expenses?new=1", label: "Add Expense", icon: Receipt },
 ] as const;
 
-export function QuickActions({ includePlans = true }: { includePlans?: boolean }) {
-  const actions = includePlans ? ACTIONS : ACTIONS.filter((action) => action.href !== "/plans?new=1");
+type ActionHref = (typeof ACTIONS)[number]["href"];
+
+export function QuickActions({ exclude = [] }: { exclude?: ActionHref[] }) {
+  const actions = ACTIONS.filter((action) => !exclude.includes(action.href));
 
   return (
     <div className="flex flex-wrap gap-3">

@@ -25,7 +25,10 @@ class MembershipPlanController extends Controller
 
     public function store(StoreMembershipPlanRequest $request): JsonResponse
     {
-        $plan = MembershipPlan::query()->create($request->validated());
+        $plan = MembershipPlan::query()->create([
+            ...$request->validated(),
+            'status' => $request->validated('status') ?? 'active',
+        ]);
 
         return $this->success($plan, status: 201);
     }

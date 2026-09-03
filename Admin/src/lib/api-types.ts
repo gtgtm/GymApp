@@ -118,6 +118,10 @@ export interface DashboardSummary {
   todays_revenue: number;
   monthly_revenue: number;
   pending_payments: number;
+  monthly_expenses: number;
+  monthly_net_profit: number;
+  new_enquiries: number;
+  active_trainers: number;
 }
 
 export interface DashboardResponse {
@@ -226,4 +230,76 @@ export interface ProgressPhoto {
   type: "before" | "after" | "progress";
   taken_on: string;
   notes: string | null;
+}
+
+export type EnquiryStatus = "new" | "contacted" | "trial" | "follow_up" | "converted" | "lost";
+
+export interface Enquiry {
+  id: number;
+  name: string;
+  mobile: string;
+  email: string | null;
+  source: string | null;
+  interested_plan_id: number | null;
+  interested_plan?: { id: number; name: string } | null;
+  follow_up_date: string | null;
+  assigned_staff_id: number | null;
+  assigned_staff?: { id: number; name: string } | null;
+  status: EnquiryStatus;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface ConversionStats {
+  total: number;
+  converted: number;
+  conversion_rate: number;
+  by_status: Record<string, number>;
+}
+
+export type TrialStatus = "active" | "expired" | "converted";
+
+export interface Trial {
+  id: number;
+  enquiry_id: number | null;
+  name: string;
+  mobile: string;
+  trial_start: string;
+  trial_end: string;
+  trainer_id: number | null;
+  trainer?: { id: number; user: { id: number; name: string } } | null;
+  status: TrialStatus;
+}
+
+export type ExpenseCategory =
+  | "rent"
+  | "electricity"
+  | "equipment"
+  | "maintenance"
+  | "salary"
+  | "marketing"
+  | "cleaning"
+  | "other";
+
+export interface Expense {
+  id: number;
+  category: ExpenseCategory;
+  amount: string;
+  expense_date: string;
+  description: string | null;
+  payment_method: string | null;
+}
+
+export type EquipmentCondition = "good" | "fair" | "needs_repair" | "out_of_service";
+
+export interface Equipment {
+  id: number;
+  name: string;
+  category: string | null;
+  purchase_date: string | null;
+  purchase_price: string | null;
+  warranty_expiry: string | null;
+  condition: EquipmentCondition;
+  last_maintenance_date: string | null;
+  next_maintenance_date: string | null;
 }

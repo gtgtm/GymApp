@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, UserCheck, CalendarDays, UserPlus } from "lucide-react";
+import { Users, UserCheck, CalendarDays, UserPlus, UserSearch } from "lucide-react";
 import { useDashboard } from "@/hooks/use-dashboard";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { QuickActions } from "@/components/dashboard/quick-actions";
@@ -26,7 +26,7 @@ export function ReceptionistDashboard() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Front Desk Dashboard</h1>
 
-      <QuickActions includePlans={false} />
+      <QuickActions exclude={["/plans?new=1", "/expenses?new=1"]} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Members" value={summary.total_members} icon={Users} />
@@ -50,6 +50,7 @@ export function ReceptionistDashboard() {
           icon={CalendarDays}
           tone="danger"
         />
+        <StatCard label="New Enquiries" value={summary.new_enquiries} icon={UserSearch} />
       </div>
 
       <ExpiryBuckets expiring={expiring} />
