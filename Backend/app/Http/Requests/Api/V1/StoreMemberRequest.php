@@ -34,6 +34,7 @@ class StoreMemberRequest extends FormRequest
             'blood_group' => ['nullable', 'string', 'max:10'],
             'notes' => ['nullable', 'string'],
             'status' => ['nullable', 'string', 'in:active,inactive'],
+            'password' => ['nullable', 'string', 'min:8'],
         ];
     }
 }

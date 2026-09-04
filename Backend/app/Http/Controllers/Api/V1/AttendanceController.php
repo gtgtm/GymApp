@@ -55,4 +55,31 @@ class AttendanceController extends Controller
             'membership_end_date' => $result['membership_end_date'],
         ], status: 201);
     }
+
+    public function scanQr(Request $request): JsonResponse
+    {
+        $request->validate(['qr_token' => ['required', 'string']]);
+
+        $member = Member::query()->where('qr_token', $request->string('qr_token')->value())->first();
+
+        if (! $member) {
+            return $this->fail('QR code not recognized.', 404);
+        }
+
+        $result = $this->attendanceService->markAttendance($member, 'present', 'qr');
+
+        if ($result['expired']) {
+            return $this->fail(
+                "{$member->full_name}'s membership has expired. Please renew before marking attendance.",
+                422,
+                ['member' => $member->only(['id', 'full_name', 'member_code']), 'membership_end_date' => $result['membership_end_date']],
+            );
+        }
+
+        return $this->success([
+            'member' => $member->only(['id', 'full_name', 'member_code']),
+            'attendance' => $result['attendance'],
+            'membership_end_date' => $result['membership_end_date'],
+        ], status: 201);
+    }
 }

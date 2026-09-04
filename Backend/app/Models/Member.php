@@ -18,7 +18,9 @@ class Member extends Model
 
     protected $fillable = [
         'gym_id',
+        'user_id',
         'member_code',
+        'qr_token',
         'photo_path',
         'full_name',
         'mobile',
@@ -47,6 +49,11 @@ class Member extends Model
     public function trainer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'trainer_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function memberships(): HasMany

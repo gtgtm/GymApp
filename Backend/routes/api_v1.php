@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\EquipmentController;
 use App\Http\Controllers\Api\V1\ExpenseController;
 use App\Http\Controllers\Api\V1\GlobalSearchController;
 use App\Http\Controllers\Api\V1\MemberController;
+use App\Http\Controllers\Api\V1\MemberPortalController;
 use App\Http\Controllers\Api\V1\MembershipPlanController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
@@ -41,9 +42,23 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('subscriptions', [SubscriptionController::class, 'store']);
     });
 
-    // Staff-only surface: admin, receptionist, trainer. Member-portal scoping
-    // (a member seeing only their own records) is introduced in a later phase
-    // alongside the mobile app, when the `member` role actually logs in here.
+    // Member-facing surface: a member sees only their own records, resolved
+    // via the linked Member row (users.id -> members.user_id), never by ID
+    // from the request. See MemberPortalController::currentMember().
+    Route::middleware('role:member')->prefix('me')->group(function (): void {
+        Route::get('profile', [MemberPortalController::class, 'profile']);
+        Route::get('membership', [MemberPortalController::class, 'membership']);
+        Route::post('membership/request-renewal', [MemberPortalController::class, 'requestRenewal']);
+        Route::get('payments', [MemberPortalController::class, 'payments']);
+        Route::get('attendance', [MemberPortalController::class, 'attendance']);
+        Route::get('qr-code', [MemberPortalController::class, 'qrCode']);
+        Route::get('workout-plans', [MemberPortalController::class, 'workoutPlans']);
+        Route::get('diet-plans', [MemberPortalController::class, 'dietPlans']);
+        Route::get('progress', [MemberPortalController::class, 'progress']);
+        Route::get('notifications', [MemberPortalController::class, 'notifications']);
+    });
+
+    // Staff-only surface: admin, receptionist, trainer.
     Route::middleware('role:admin,receptionist,trainer')->group(function (): void {
         Route::apiResource('members', MemberController::class)->except(['store']);
         Route::post('members', [MemberController::class, 'store'])->middleware('member_limit');
@@ -56,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
         Route::get('attendance', [AttendanceController::class, 'index']);
         Route::post('attendance', [AttendanceController::class, 'store']);
+        Route::post('attendance/scan-qr', [AttendanceController::class, 'scanQr']);
 
         Route::apiResource('trainers', TrainerController::class)->only(['index', 'show']);
 

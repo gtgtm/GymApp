@@ -156,11 +156,30 @@ class DemoGymSeeder extends Seeder
         ];
 
         $firstMember = null;
+        $memberRoleId = $roles[Role::MEMBER];
 
         foreach ($membersData as $index => $data) {
+            $memberUser = null;
+
+            if ($index === 0) {
+                $memberUser = User::query()->updateOrCreate(
+                    ['email' => 'member@demofitness.test'],
+                    [
+                        'gym_id' => $gym->id,
+                        'role_id' => $memberRoleId,
+                        'name' => $data['name'],
+                        'phone' => $data['mobile'],
+                        'password' => Hash::make('password'),
+                        'status' => 'active',
+                    ],
+                );
+            }
+
             $member = Member::query()->updateOrCreate(
                 ['gym_id' => $gym->id, 'mobile' => $data['mobile']],
                 [
+                    'user_id' => $memberUser?->id,
+                    'qr_token' => 'DEMO-QR-'.($index + 1),
                     'member_code' => 'MEM-DEMO'.($index + 1),
                     'full_name' => $data['name'],
                     'joining_date' => $today->copy()->subDays(60),

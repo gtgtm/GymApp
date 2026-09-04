@@ -32,6 +32,8 @@ class GymNotification extends Model
 
     public const TYPE_EQUIPMENT_MAINTENANCE = 'equipment_maintenance';
 
+    public const TYPE_RENEWAL_REQUESTED = 'renewal_requested';
+
     public const CHANNEL_IN_APP = 'in_app';
 
     public const CHANNEL_EMAIL = 'email';
