@@ -1,30 +1,35 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gymapp_member/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  // flutter_secure_storage talks to the platform over a MethodChannel that
+  // has no real implementation in the widget-test harness. Without this
+  // mock, the read() call in AuthController.build() awaits forever and
+  // pumpAndSettle times out.
+  const secureStorageChannel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  setUp(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+      secureStorageChannel,
+      (call) async => call.method == 'read' ? null : <String, String>{},
+    );
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+      secureStorageChannel,
+      null,
+    );
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('App boots to the login screen when logged out', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: GymAppMember()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sign In'), findsOneWidget);
   });
 }
