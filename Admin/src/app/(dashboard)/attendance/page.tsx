@@ -20,8 +20,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { QrScanner } from "@/components/attendance/qr-scanner";
 import { toast } from "sonner";
 
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -54,32 +56,45 @@ export default function AttendancePage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Attendance</h1>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Mark Attendance</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4 sm:flex-row">
-          <Select value={selectedMemberId} onValueChange={(value) => setSelectedMemberId(value ?? "")}>
-            <SelectTrigger className="sm:w-96">
-              <SelectValue placeholder="Search member by name, mobile, or ID" />
-            </SelectTrigger>
-            <SelectContent>
-              {membersResponse?.data.map((member) => (
-                <SelectItem key={member.id} value={String(member.id)}>
-                  {member.full_name} — {member.mobile} ({member.member_code})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            size="lg"
-            onClick={() => void handleMark()}
-            disabled={markAttendance.isPending}
-          >
-            {markAttendance.isPending ? "Marking..." : "Mark Present"}
-          </Button>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="search">
+        <TabsList>
+          <TabsTrigger value="search">Search Member</TabsTrigger>
+          <TabsTrigger value="scan">Scan QR Code</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="search">
+          <Card>
+            <CardHeader>
+              <CardTitle>Mark Attendance</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4 sm:flex-row">
+              <Select value={selectedMemberId} onValueChange={(value) => setSelectedMemberId(value ?? "")}>
+                <SelectTrigger className="sm:w-96">
+                  <SelectValue placeholder="Search member by name, mobile, or ID" />
+                </SelectTrigger>
+                <SelectContent>
+                  {membersResponse?.data.map((member) => (
+                    <SelectItem key={member.id} value={String(member.id)}>
+                      {member.full_name} — {member.mobile} ({member.member_code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                size="lg"
+                onClick={() => void handleMark()}
+                disabled={markAttendance.isPending}
+              >
+                {markAttendance.isPending ? "Marking..." : "Mark Present"}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="scan">
+          <QrScanner />
+        </TabsContent>
+      </Tabs>
 
       <Card>
         <CardHeader>

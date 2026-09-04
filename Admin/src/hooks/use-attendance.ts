@@ -47,3 +47,27 @@ export function useMarkAttendance() {
     },
   });
 }
+
+interface ScanQrResult {
+  member: { id: number; full_name: string; member_code: string };
+  attendance: AttendanceRecord;
+  membership_end_date: string;
+}
+
+export function useScanQrAttendance() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (qrToken: string) => {
+      const { data } = await apiClient.post<ApiResponse<ScanQrResult>>("/attendance/scan-qr", {
+        qr_token: qrToken,
+      });
+      if (!data.success) throw new Error(data.error.message);
+      return data.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["attendance"] });
+      void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+}
