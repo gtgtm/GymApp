@@ -16,6 +16,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { ExpiryBuckets } from "@/components/dashboard/expiry-buckets";
 import { SmartSuggestions } from "@/components/dashboard/smart-suggestions";
+import { SubscriptionStatus } from "@/components/dashboard/subscription-status";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function AdminDashboard() {
@@ -93,7 +94,12 @@ export function AdminDashboard() {
         <StatCard label="Active Trainers" value={summary.active_trainers} icon={Dumbbell} />
       </div>
 
-      <ExpiryBuckets expiring={expiring} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <ExpiryBuckets expiring={expiring} />
+        </div>
+        <SubscriptionStatus />
+      </div>
     </div>
   );
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Models\User;
+use App\Rules\ExistsInCurrentGym;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreMemberRequest extends FormRequest
@@ -26,7 +28,7 @@ class StoreMemberRequest extends FormRequest
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:20'],
             'joining_date' => ['required', 'date'],
-            'trainer_id' => ['nullable', 'exists:users,id'],
+            'trainer_id' => ['nullable', new ExistsInCurrentGym(User::class, 'gym_id')],
             'height_cm' => ['nullable', 'numeric', 'min:0'],
             'weight_kg' => ['nullable', 'numeric', 'min:0'],
             'blood_group' => ['nullable', 'string', 'max:10'],

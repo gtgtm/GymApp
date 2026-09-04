@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Models\MembershipPlan;
+use App\Rules\ExistsInCurrentGym;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RenewMembershipRequest extends FormRequest
@@ -16,7 +18,7 @@ class RenewMembershipRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'membership_plan_id' => ['required', 'exists:membership_plans,id'],
+            'membership_plan_id' => ['required', new ExistsInCurrentGym(MembershipPlan::class)],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'tax' => ['nullable', 'numeric', 'min:0'],
             'amount_paid' => ['required', 'numeric', 'min:0'],

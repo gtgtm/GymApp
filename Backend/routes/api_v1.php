@@ -9,12 +9,14 @@ use App\Http\Controllers\Api\V1\DietPlanController;
 use App\Http\Controllers\Api\V1\EnquiryController;
 use App\Http\Controllers\Api\V1\EquipmentController;
 use App\Http\Controllers\Api\V1\ExpenseController;
+use App\Http\Controllers\Api\V1\GlobalSearchController;
 use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MembershipPlanController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ProgressPhotoController;
 use App\Http\Controllers\Api\V1\ReportController;
+use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\TrainerController;
 use App\Http\Controllers\Api\V1\TrialController;
 use App\Http\Controllers\Api\V1\WorkoutPlanController;
@@ -32,11 +34,19 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::put('notifications/{notification}/read', [NotificationController::class, 'markRead']);
     Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
 
+    Route::get('subscriptions/mine', [SubscriptionController::class, 'mine']);
+
+    Route::middleware('role:super_admin')->group(function (): void {
+        Route::get('subscriptions', [SubscriptionController::class, 'index']);
+        Route::post('subscriptions', [SubscriptionController::class, 'store']);
+    });
+
     // Staff-only surface: admin, receptionist, trainer. Member-portal scoping
     // (a member seeing only their own records) is introduced in a later phase
     // alongside the mobile app, when the `member` role actually logs in here.
     Route::middleware('role:admin,receptionist,trainer')->group(function (): void {
-        Route::apiResource('members', MemberController::class);
+        Route::apiResource('members', MemberController::class)->except(['store']);
+        Route::post('members', [MemberController::class, 'store'])->middleware('member_limit');
         Route::post('members/{member}/renew', [MemberController::class, 'renew']);
         Route::get('members/{member}/payments', [MemberController::class, 'payments']);
 
@@ -59,6 +69,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('progress-photos', [ProgressPhotoController::class, 'index']);
         Route::post('progress-photos', [ProgressPhotoController::class, 'store']);
         Route::delete('progress-photos/{progressPhoto}', [ProgressPhotoController::class, 'destroy']);
+
+        Route::get('search', [GlobalSearchController::class, 'index']);
     });
 
     Route::middleware('role:admin,receptionist')->group(function (): void {

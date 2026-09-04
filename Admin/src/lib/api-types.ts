@@ -375,3 +375,23 @@ export interface SalesReport {
   };
   revenue_by_plan: Array<{ plan: string; sold_count: number; estimated_revenue: number }>;
 }
+
+export interface GlobalSearchResults {
+  members: Array<{ id: number; full_name: string; mobile: string; member_code: string }>;
+  trainers: Array<{ id: number; user: { id: number; name: string; phone: string | null } }>;
+  payments: Array<{ id: number; receipt_number: string; amount: string; member_id: number }>;
+  enquiries: Array<{ id: number; name: string; mobile: string; status: string }>;
+}
+
+export type SubscriptionPlan = "starter" | "professional" | "enterprise";
+
+export interface Subscription {
+  id: number;
+  gym_id: number;
+  gym?: { id: number; name: string };
+  plan: SubscriptionPlan;
+  member_limit: number | null;
+  start_date: string;
+  expiry_date: string;
+  payment_status: "active" | "past_due" | "cancelled";
+}

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Models\Member;
+use App\Models\Trainer;
+use App\Rules\ExistsInCurrentGym;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreWorkoutPlanRequest extends FormRequest
@@ -16,8 +19,8 @@ class StoreWorkoutPlanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'member_id' => ['required', 'exists:members,id'],
-            'trainer_id' => ['nullable', 'exists:trainers,id'],
+            'member_id' => ['required', new ExistsInCurrentGym(Member::class)],
+            'trainer_id' => ['nullable', new ExistsInCurrentGym(Trainer::class)],
             'name' => ['required', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
             'status' => ['nullable', 'string', 'in:active,inactive'],

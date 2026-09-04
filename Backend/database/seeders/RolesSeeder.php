@@ -10,6 +10,7 @@ class RolesSeeder extends Seeder
     public function run(): void
     {
         collect([
+            ['name' => Role::SUPER_ADMIN, 'label' => 'Super Admin'],
             ['name' => Role::ADMIN, 'label' => 'Admin / Gym Owner'],
             ['name' => Role::RECEPTIONIST, 'label' => 'Receptionist'],
             ['name' => Role::TRAINER, 'label' => 'Trainer'],

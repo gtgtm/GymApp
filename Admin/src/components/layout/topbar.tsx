@@ -5,6 +5,7 @@ import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
+import { GlobalSearchBar } from "@/components/layout/global-search-bar";
 
 const NotificationBell = dynamic(
   () => import("@/components/layout/notification-bell").then((mod) => mod.NotificationBell),
@@ -23,8 +24,9 @@ export function Topbar() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">
-      <div>
+      <div className="flex items-center gap-6">
         <p className="text-sm text-muted-foreground">{user?.gym.name}</p>
+        <GlobalSearchBar />
       </div>
       <div className="flex items-center gap-3">
         <NotificationBell />

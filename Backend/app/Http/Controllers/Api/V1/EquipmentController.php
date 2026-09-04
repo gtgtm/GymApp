@@ -8,11 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreEquipmentRequest;
 use App\Http\Requests\Api\V1\UpdateEquipmentRequest;
 use App\Models\Equipment;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 
 class EquipmentController extends Controller
 {
+    public function __construct(private readonly AuditLogService $auditLog) {}
+
     public function index(): JsonResponse
     {
         return $this->success(Equipment::query()->orderBy('name')->get());
@@ -21,6 +24,8 @@ class EquipmentController extends Controller
     public function store(StoreEquipmentRequest $request): JsonResponse
     {
         $equipment = Equipment::query()->create($request->validated());
+
+        $this->auditLog->log('equipment.created', $equipment, null, $equipment->toArray());
 
         return $this->success($equipment, status: 201);
     }
@@ -32,13 +37,17 @@ class EquipmentController extends Controller
 
     public function update(UpdateEquipmentRequest $request, Equipment $equipment): JsonResponse
     {
+        $before = $equipment->toArray();
         $equipment->update($request->validated());
+
+        $this->auditLog->log('equipment.updated', $equipment, $before, $equipment->toArray());
 
         return $this->success($equipment);
     }
 
     public function destroy(Equipment $equipment): JsonResponse
     {
+        $this->auditLog->log('equipment.deleted', $equipment, $equipment->toArray());
         $equipment->delete();
 
         return $this->success(['message' => 'Equipment deleted.']);

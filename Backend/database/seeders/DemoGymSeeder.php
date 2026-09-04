@@ -12,6 +12,7 @@ use App\Models\Member;
 use App\Models\Membership;
 use App\Models\MembershipPlan;
 use App\Models\Role;
+use App\Models\Subscription;
 use App\Models\Trainer;
 use App\Models\Trial;
 use App\Models\User;
@@ -32,6 +33,16 @@ class DemoGymSeeder extends Seeder
                 'phone' => '9999900000',
                 'address' => '123 Fitness Street, Mumbai',
                 'status' => 'active',
+            ],
+        );
+
+        Subscription::query()->updateOrCreate(
+            ['gym_id' => $gym->id, 'plan' => Subscription::PLAN_PROFESSIONAL],
+            [
+                'member_limit' => Subscription::PLAN_LIMITS[Subscription::PLAN_PROFESSIONAL],
+                'start_date' => Carbon::today()->subMonths(2),
+                'expiry_date' => Carbon::today()->addYear(),
+                'payment_status' => Subscription::STATUS_ACTIVE,
             ],
         );
 

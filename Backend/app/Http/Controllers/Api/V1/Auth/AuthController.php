@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
@@ -31,6 +32,8 @@ class AuthController extends Controller
         $credentials = $validator->validated();
 
         if (! Auth::attempt($credentials)) {
+            $this->logFailedAttempt($credentials['email']);
+
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -42,6 +45,8 @@ class AuthController extends Controller
         if ($user->status !== 'active') {
             Auth::logout();
 
+            $this->logFailedAttempt($credentials['email'], $user);
+
             return $this->fail('This account is inactive.', 403);
         }
 
@@ -52,6 +57,22 @@ class AuthController extends Controller
         return $this->success([
             'token' => $token,
             'user' => $user->load('role', 'gym'),
+        ]);
+    }
+
+    private function logFailedAttempt(string $email, ?User $user = null): void
+    {
+        $user ??= User::query()->where('email', $email)->first();
+
+        AuditLog::query()->create([
+            'gym_id' => $user?->gym_id,
+            'user_id' => $user?->id,
+            'action' => 'login_failed',
+            'entity_type' => User::class,
+            'entity_id' => $user?->id,
+            'before' => null,
+            'after' => ['email' => $email],
+            'ip_address' => request()->ip(),
         ]);
     }
 

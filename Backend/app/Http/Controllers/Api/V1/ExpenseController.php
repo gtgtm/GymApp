@@ -8,11 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreExpenseRequest;
 use App\Http\Requests\Api\V1\UpdateExpenseRequest;
 use App\Models\Expense;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
+    public function __construct(private readonly AuditLogService $auditLog) {}
+
     public function index(Request $request): JsonResponse
     {
         $expenses = Expense::query()
@@ -32,6 +35,8 @@ class ExpenseController extends Controller
             'recorded_by' => auth()->id(),
         ]);
 
+        $this->auditLog->log('expense.created', $expense, null, $expense->toArray());
+
         return $this->success($expense, status: 201);
     }
 
@@ -42,13 +47,17 @@ class ExpenseController extends Controller
 
     public function update(UpdateExpenseRequest $request, Expense $expense): JsonResponse
     {
+        $before = $expense->toArray();
         $expense->update($request->validated());
+
+        $this->auditLog->log('expense.updated', $expense, $before, $expense->toArray());
 
         return $this->success($expense);
     }
 
     public function destroy(Expense $expense): JsonResponse
     {
+        $this->auditLog->log('expense.deleted', $expense, $expense->toArray());
         $expense->delete();
 
         return $this->success(['message' => 'Expense deleted.']);

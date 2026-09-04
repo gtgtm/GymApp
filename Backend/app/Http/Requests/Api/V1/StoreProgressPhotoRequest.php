@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Models\Member;
+use App\Rules\ExistsInCurrentGym;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProgressPhotoRequest extends FormRequest
@@ -16,7 +18,7 @@ class StoreProgressPhotoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'member_id' => ['required', 'exists:members,id'],
+            'member_id' => ['required', new ExistsInCurrentGym(Member::class)],
             'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'type' => ['nullable', 'string', 'in:before,after,progress'],
             'taken_on' => ['required', 'date'],
