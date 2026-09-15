@@ -20,7 +20,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(user?.gymName ?? 'GymApp'),
+        title: Text(user?.gymName ?? 'GymBrain'),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
