@@ -1,0 +1,53 @@
+name: gymapp_admin
+description: "GymApp staff app - dashboard, members, attendance/QR scan, payments, plans, and reports for admin, receptionist, and trainer roles."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^3.1.0
+  riverpod_annotation: ^4.0.7
+
+  # Navigation
+  go_router: ^14.6.2
+
+  # Networking
+  dio: ^5.7.0
+
+  # Secure token storage
+  flutter_secure_storage: ^9.2.2
+
+  # Native camera QR scanning (staff scan member QR codes)
+  mobile_scanner: ^6.0.7
+
+  # Charts (reports)
+  fl_chart: ^0.69.2
+
+  # Date formatting
+  intl: ^0.19.0
+
+  # Progress photo capture/upload
+  image_picker: ^1.1.2
+
+  # Share/open exported report files (CSV/PDF)
+  share_plus: ^10.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  build_runner: ^2.16.1
+  riverpod_generator: ^4.0.9
+
+flutter:
+  uses-material-design: true
