@@ -16,7 +16,7 @@ export function DateRangePicker({
   onChange: (range: DateRange) => void;
 }) {
   return (
-    <div className="flex items-end gap-3">
+    <div className="flex flex-wrap items-end gap-3">
       <div className="space-y-1.5">
         <Label htmlFor="report-from" className="text-xs">
           From

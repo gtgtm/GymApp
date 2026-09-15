@@ -32,7 +32,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">GymApp</CardTitle>
+          <CardTitle className="text-2xl">GymBrain</CardTitle>
           <CardDescription>Sign in to manage your gym</CardDescription>
         </CardHeader>
         <CardContent>

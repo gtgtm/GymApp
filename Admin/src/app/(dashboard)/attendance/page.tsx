@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useMembers } from "@/hooks/use-members";
 import { useAttendance, useMarkAttendance } from "@/hooks/use-attendance";
 import {
@@ -23,8 +24,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { QrScanner } from "@/components/attendance/qr-scanner";
 import { toast } from "sonner";
+
+const QrScanner = dynamic(
+  () => import("@/components/attendance/qr-scanner").then((mod) => mod.QrScanner),
+  { ssr: false },
+);
 
 const TODAY = new Date().toISOString().slice(0, 10);
 

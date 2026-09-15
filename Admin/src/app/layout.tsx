@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GymApp Admin",
+  title: "GymBrain Admin",
   description: "Gym management and member management dashboard",
 };
 

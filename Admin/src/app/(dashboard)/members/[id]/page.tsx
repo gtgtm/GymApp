@@ -24,9 +24,11 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{member.full_name}</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-semibold tracking-tight sm:text-2xl">
+            {member.full_name}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {member.member_code} · {member.mobile}
           </p>
@@ -38,7 +40,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
       </div>
 
       <Tabs defaultValue="overview">
-        <TabsList>
+        <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="membership">Membership</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
@@ -53,7 +55,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 text-sm">
+            <CardContent className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
               <Field label="Email" value={member.email} />
               <Field label="Date of Birth" value={member.date_of_birth} />
               <Field label="Gender" value={member.gender} />
@@ -75,7 +77,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
             <CardHeader>
               <CardTitle>Current Membership</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 text-sm">
+            <CardContent className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
               <Field label="Start Date" value={member.current_membership?.start_date} />
               <Field label="End Date" value={member.current_membership?.end_date} />
               <Field label="Status" value={member.current_membership?.status} />
