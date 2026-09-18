@@ -9,9 +9,13 @@ class DietRepository {
 
   Future<List<DietPlan>> list(int memberId) {
     return unwrap(
-      () => _apiClient.dio.get('/diet-plans', queryParameters: {'member_id': memberId}),
-      (data) =>
-          (data as List<dynamic>).map((json) => DietPlan.fromJson(json as Map<String, dynamic>)).toList(),
+      () => _apiClient.dio.get(
+        '/diet-plans',
+        queryParameters: {'member_id': memberId},
+      ),
+      (data) => (data as List<dynamic>)
+          .map((json) => DietPlan.fromJson(json as Map<String, dynamic>))
+          .toList(),
     );
   }
 

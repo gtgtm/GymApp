@@ -14,7 +14,9 @@ class SubscriptionStatusCard extends ConsumerWidget {
     return subscriptionAsync.when(
       data: (subscription) {
         if (subscription == null) return const SizedBox.shrink();
-        final daysLeft = DateTime.parse(subscription.expiryDate).difference(DateTime.now()).inDays;
+        final daysLeft = DateTime.parse(subscription.expiryDate)
+            .difference(DateTime.now())
+            .inDays;
 
         return Card(
           child: Padding(
@@ -22,21 +24,33 @@ class SubscriptionStatusCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Subscription', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Subscription',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
                 Text(
-                  subscription.plan[0].toUpperCase() + subscription.plan.substring(1),
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  subscription.plan[0].toUpperCase() +
+                      subscription.plan.substring(1),
+                  style: Theme.of(context).textTheme.headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text('Member limit: ${subscription.memberLimit}'),
-                Text('Expires: ${DateFormat.yMMMd().format(DateTime.parse(subscription.expiryDate))}'),
+                Text(
+                  'Expires: ${DateFormat.yMMMd().format(DateTime.parse(subscription.expiryDate))}',
+                ),
                 if (daysLeft <= 14)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      daysLeft < 0 ? 'Subscription expired' : 'Expires in $daysLeft days',
-                      style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.w600),
+                      daysLeft < 0
+                          ? 'Subscription expired'
+                          : 'Expires in $daysLeft days',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
               ],

@@ -32,17 +32,16 @@ class MembershipInfo {
 }
 
 class MembershipDetails {
-  const MembershipDetails({
-    required this.current,
-    required this.expiryBucket,
-  });
+  const MembershipDetails({required this.current, required this.expiryBucket});
 
   factory MembershipDetails.fromJson(Map<String, dynamic> json) {
     return MembershipDetails(
       current: json['current'] != null
           ? MembershipInfo.fromJson(json['current'] as Map<String, dynamic>)
           : null,
-      expiryBucket: expiryBucketFromString(json['expiry_bucket'] as String? ?? 'red'),
+      expiryBucket: expiryBucketFromString(
+        json['expiry_bucket'] as String? ?? 'red',
+      ),
     );
   }
 
@@ -63,7 +62,8 @@ class MemberProfile {
   });
 
   factory MemberProfile.fromJson(Map<String, dynamic> json) {
-    final currentMembership = json['current_membership'] as Map<String, dynamic>?;
+    final currentMembership =
+        json['current_membership'] as Map<String, dynamic>?;
 
     return MemberProfile(
       id: json['id'] as int,
@@ -71,8 +71,11 @@ class MemberProfile {
       fullName: json['full_name'] as String,
       mobile: json['mobile'] as String,
       status: json['status'] as String,
-      expiryBucket: expiryBucketFromString(json['expiry_bucket'] as String? ?? 'red'),
-      trainerName: (json['trainer'] as Map<String, dynamic>?)?['name'] as String?,
+      expiryBucket: expiryBucketFromString(
+        json['expiry_bucket'] as String? ?? 'red',
+      ),
+      trainerName:
+          (json['trainer'] as Map<String, dynamic>?)?['name'] as String?,
       currentMembershipEnd: currentMembership != null
           ? DateTime.tryParse(currentMembership['end_date'] as String)
           : null,

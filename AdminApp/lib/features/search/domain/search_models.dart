@@ -1,5 +1,10 @@
 class SearchMemberResult {
-  const SearchMemberResult({required this.id, required this.fullName, required this.mobile, required this.memberCode});
+  const SearchMemberResult({
+    required this.id,
+    required this.fullName,
+    required this.mobile,
+    required this.memberCode,
+  });
 
   factory SearchMemberResult.fromJson(Map<String, dynamic> json) {
     return SearchMemberResult(
@@ -34,7 +39,11 @@ class SearchTrainerResult {
 }
 
 class SearchPaymentResult {
-  const SearchPaymentResult({required this.id, required this.receiptNumber, required this.amount});
+  const SearchPaymentResult({
+    required this.id,
+    required this.receiptNumber,
+    required this.amount,
+  });
 
   factory SearchPaymentResult.fromJson(Map<String, dynamic> json) {
     return SearchPaymentResult(
@@ -50,7 +59,11 @@ class SearchPaymentResult {
 }
 
 class SearchEnquiryResult {
-  const SearchEnquiryResult({required this.id, required this.name, required this.status});
+  const SearchEnquiryResult({
+    required this.id,
+    required this.name,
+    required this.status,
+  });
 
   factory SearchEnquiryResult.fromJson(Map<String, dynamic> json) {
     return SearchEnquiryResult(
@@ -95,5 +108,9 @@ class GlobalSearchResults {
   final List<SearchPaymentResult> payments;
   final List<SearchEnquiryResult> enquiries;
 
-  bool get isEmpty => members.isEmpty && trainers.isEmpty && payments.isEmpty && enquiries.isEmpty;
+  bool get isEmpty =>
+      members.isEmpty &&
+      trainers.isEmpty &&
+      payments.isEmpty &&
+      enquiries.isEmpty;
 }

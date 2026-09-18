@@ -3,7 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import 'package:gymapp_member/core/theme/app_tokens.dart';
+import 'package:gymapp_member/core/widgets/app_list_card.dart';
 import 'package:gymapp_member/core/widgets/async_value_view.dart';
+import 'package:gymapp_member/core/widgets/empty_state.dart';
+import 'package:gymapp_member/core/widgets/section_header.dart';
+import 'package:gymapp_member/core/widgets/status_badge.dart';
 import 'package:gymapp_member/features/attendance/presentation/attendance_providers.dart';
 import 'package:gymapp_member/features/membership/presentation/membership_providers.dart';
 
@@ -41,9 +46,21 @@ class AttendanceScreen extends ConsumerWidget {
                       onRetry: () => ref.invalidate(memberQrCodeProvider),
                       builder: (context, qr) => Column(
                         children: [
-                          QrImageView(data: qr.qrToken, size: 200),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(
+                                context.tokens.radiusLg,
+                              ),
+                            ),
+                            child: QrImageView(data: qr.qrToken, size: 200),
+                          ),
                           const SizedBox(height: 12),
-                          Text(qr.memberCode, style: Theme.of(context).textTheme.titleMedium),
+                          Text(
+                            qr.memberCode,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                         ],
                       ),
                     ),
@@ -52,8 +69,7 @@ class AttendanceScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            Text('Recent Attendance', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
+            const SectionHeader(title: 'Recent Attendance'),
             AsyncValueView(
               value: historyAsync,
               onRetry: () => ref.invalidate(myAttendanceHistoryProvider),
@@ -61,20 +77,30 @@ class AttendanceScreen extends ConsumerWidget {
                 if (records.isEmpty) {
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text('No attendance recorded yet.')),
+                    child: EmptyState(
+                      icon: Icons.event_available_outlined,
+                      message: 'No attendance recorded yet.',
+                    ),
                   );
                 }
 
                 return Column(
                   children: [
                     for (final record in records)
-                      Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: const Icon(Icons.check_circle_outline),
-                          title: Text(DateFormat.yMMMd().format(record.date)),
-                          subtitle: record.checkInTime != null ? Text(record.checkInTime!) : null,
-                          trailing: Chip(label: Text(record.status)),
+                      AppListCard(
+                        leading: Icon(
+                          Icons.check_circle_outline,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        title: Text(DateFormat.yMMMd().format(record.date)),
+                        subtitle: record.checkInTime != null
+                            ? Text(record.checkInTime!)
+                            : null,
+                        trailing: StatusBadge(
+                          label: record.status,
+                          tone: record.status == 'present'
+                              ? StatusTone.success
+                              : StatusTone.neutral,
                         ),
                       ),
                   ],

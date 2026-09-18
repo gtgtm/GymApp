@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:gymapp_admin/core/widgets/status_badge.dart';
 import 'package:gymapp_admin/features/members/domain/member_models.dart';
 
 class ExpiryBadge extends StatelessWidget {
@@ -9,19 +10,14 @@ class ExpiryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (color, label) = switch (bucket) {
-      ExpiryBucket.green => (Colors.green, 'Active'),
-      ExpiryBucket.yellow => (Colors.amber, 'Expiring soon'),
-      ExpiryBucket.orange => (Colors.orange, 'Expiring soon'),
-      ExpiryBucket.red => (Colors.red, 'Expired'),
-      ExpiryBucket.unknown => (Colors.grey, 'Unknown'),
+    final (tone, label) = switch (bucket) {
+      ExpiryBucket.green => (StatusTone.success, 'Active'),
+      ExpiryBucket.yellow => (StatusTone.warning, 'Expiring soon'),
+      ExpiryBucket.orange => (StatusTone.warning, 'Expiring soon'),
+      ExpiryBucket.red => (StatusTone.danger, 'Expired'),
+      ExpiryBucket.unknown => (StatusTone.neutral, 'Unknown'),
     };
 
-    return Chip(
-      label: Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
-      backgroundColor: color.withValues(alpha: 0.12),
-      side: BorderSide.none,
-      visualDensity: VisualDensity.compact,
-    );
+    return StatusBadge(label: label, tone: tone);
   }
 }

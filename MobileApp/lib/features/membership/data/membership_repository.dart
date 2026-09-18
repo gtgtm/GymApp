@@ -29,12 +29,12 @@ class MembershipRepository {
   }
 
   Future<({String qrToken, String memberCode})> qrCode() {
-    return unwrap(
-      () => _apiClient.dio.get('/me/qr-code'),
-      (data) {
-        final map = data as Map<String, dynamic>;
-        return (qrToken: map['qr_token'] as String, memberCode: map['member_code'] as String);
-      },
-    );
+    return unwrap(() => _apiClient.dio.get('/me/qr-code'), (data) {
+      final map = data as Map<String, dynamic>;
+      return (
+        qrToken: map['qr_token'] as String,
+        memberCode: map['member_code'] as String,
+      );
+    });
   }
 }

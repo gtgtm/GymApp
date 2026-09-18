@@ -10,8 +10,9 @@ class EquipmentRepository {
   Future<List<Equipment>> list() {
     return unwrap(
       () => _apiClient.dio.get('/equipment'),
-      (data) =>
-          (data as List<dynamic>).map((json) => Equipment.fromJson(json as Map<String, dynamic>)).toList(),
+      (data) => (data as List<dynamic>)
+          .map((json) => Equipment.fromJson(json as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -25,8 +26,9 @@ class EquipmentRepository {
   Future<List<Equipment>> maintenanceDue() {
     return unwrap(
       () => _apiClient.dio.get('/equipment-maintenance-due'),
-      (data) =>
-          (data as List<dynamic>).map((json) => Equipment.fromJson(json as Map<String, dynamic>)).toList(),
+      (data) => (data as List<dynamic>)
+          .map((json) => Equipment.fromJson(json as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

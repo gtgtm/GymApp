@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
+import 'package:gymapp_admin/core/widgets/stat_card.dart';
 import 'package:gymapp_admin/features/reports/presentation/report_providers.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
@@ -37,7 +38,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   Widget build(BuildContext context) {
     final format = DateFormat('yyyy-MM-dd');
     final displayFormat = DateFormat.yMMMd();
-    final summaryAsync = ref.watch(financialSummaryProvider(format.format(_from), format.format(_to)));
+    final summaryAsync = ref.watch(
+      financialSummaryProvider(format.format(_from), format.format(_to)),
+    );
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -75,19 +78,39 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: _StatTile(label: 'Revenue', value: summary.revenue, tone: StatTone.success)),
+                    Expanded(
+                      child: StatCard(
+                        label: 'Revenue',
+                        value: '₹${summary.revenue.toStringAsFixed(2)}',
+                        icon: Icons.trending_up,
+                        tone: StatTone.success,
+                      ),
+                    ),
                     const SizedBox(width: 12),
-                    Expanded(child: _StatTile(label: 'Expenses', value: summary.expenses, tone: StatTone.danger)),
+                    Expanded(
+                      child: StatCard(
+                        label: 'Expenses',
+                        value: '₹${summary.expenses.toStringAsFixed(2)}',
+                        icon: Icons.trending_down,
+                        tone: StatTone.danger,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                _StatTile(
+                StatCard(
                   label: 'Profit',
-                  value: summary.profit,
-                  tone: summary.profit >= 0 ? StatTone.success : StatTone.danger,
+                  value: '₹${summary.profit.toStringAsFixed(2)}',
+                  icon: Icons.show_chart,
+                  tone: summary.profit >= 0
+                      ? StatTone.success
+                      : StatTone.danger,
                 ),
                 const SizedBox(height: 20),
-                Text('Payment Method Breakdown', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Payment Method Breakdown',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
                 if (summary.paymentMethodBreakdown.isEmpty)
                   const Text('No payments in this period.')
@@ -95,10 +118,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   Card(
                     child: Column(
                       children: [
-                        for (final entry in summary.paymentMethodBreakdown.entries)
+                        for (final entry
+                            in summary.paymentMethodBreakdown.entries)
                           ListTile(
                             title: Text(entry.key.replaceAll('_', ' ')),
-                            trailing: Text('₹${entry.value.toStringAsFixed(2)}'),
+                            trailing: Text(
+                              '₹${entry.value.toStringAsFixed(2)}',
+                            ),
                           ),
                       ],
                     ),
@@ -108,37 +134,6 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
           },
         ),
       ],
-    );
-  }
-}
-
-enum StatTone { success, danger }
-
-class _StatTile extends StatelessWidget {
-  const _StatTile({required this.label, required this.value, required this.tone});
-
-  final String label;
-  final double value;
-  final StatTone tone;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = tone == StatTone.success ? Colors.green : Theme.of(context).colorScheme.error;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: Theme.of(context).textTheme.bodySmall),
-            const SizedBox(height: 4),
-            Text(
-              '₹${value.toStringAsFixed(2)}',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: color, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

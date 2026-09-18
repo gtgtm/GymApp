@@ -26,16 +26,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    await ref.read(authControllerProvider.notifier).login(
+    await ref
+        .read(authControllerProvider.notifier)
+        .login(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
     final state = ref.read(authControllerProvider);
     if (state.hasError && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state.error.toString())),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(state.error.toString())));
     }
   }
 
@@ -55,28 +56,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(
-                    Icons.admin_panel_settings_outlined,
-                    size: 56,
-                    color: Theme.of(context).colorScheme.primary,
+                  Container(
+                    width: 72,
+                    height: 72,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary
+                          .withValues(alpha: 0.14),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.bolt_rounded,
+                      size: 36,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Text(
-                    'GymBrain',
+                    'GYMBRAIN',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
-                    'Staff App',
+                    'STAFF APP',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      letterSpacing: 3,
+                    ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -102,9 +115,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                         ),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                     validator: (value) {

@@ -21,7 +21,8 @@ class _RecordPaymentSheet extends ConsumerStatefulWidget {
   const _RecordPaymentSheet();
 
   @override
-  ConsumerState<_RecordPaymentSheet> createState() => _RecordPaymentSheetState();
+  ConsumerState<_RecordPaymentSheet> createState() =>
+      _RecordPaymentSheetState();
 }
 
 class _RecordPaymentSheetState extends ConsumerState<_RecordPaymentSheet> {
@@ -41,11 +42,15 @@ class _RecordPaymentSheetState extends ConsumerState<_RecordPaymentSheet> {
   }
 
   Future<void> _submit() async {
-    if (!(_formKey.currentState?.validate() ?? false) || _selectedMember == null) return;
+    if (!(_formKey.currentState?.validate() ?? false) ||
+        _selectedMember == null)
+      return;
 
     setState(() => _isSaving = true);
     try {
-      await ref.read(paymentRepositoryProvider).create(
+      await ref
+          .read(paymentRepositoryProvider)
+          .create(
             PaymentInput(
               memberId: _selectedMember!.id,
               amount: double.parse(_amountController.text),
@@ -55,13 +60,13 @@ class _RecordPaymentSheetState extends ConsumerState<_RecordPaymentSheet> {
       ref.invalidate(paymentListProvider);
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Payment recorded.')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Payment recorded.')));
       }
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -85,7 +90,10 @@ class _RecordPaymentSheetState extends ConsumerState<_RecordPaymentSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Collect Payment', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Collect Payment',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 16),
             if (_selectedMember == null) ...[
               TextField(
@@ -102,7 +110,9 @@ class _RecordPaymentSheetState extends ConsumerState<_RecordPaymentSheet> {
                 child: membersAsync.when(
                   data: (page) {
                     if (_search.trim().length < 2) {
-                      return const Center(child: Text('Type to search for a member.'));
+                      return const Center(
+                        child: Text('Type to search for a member.'),
+                      );
                     }
                     if (page.members.isEmpty) {
                       return const Center(child: Text('No members found.'));
@@ -119,7 +129,8 @@ class _RecordPaymentSheetState extends ConsumerState<_RecordPaymentSheet> {
                       },
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (error, _) => Center(child: Text('$error')),
                 ),
               ),
@@ -136,11 +147,14 @@ class _RecordPaymentSheetState extends ConsumerState<_RecordPaymentSheet> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Amount'),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) return 'Required';
-                  if (double.tryParse(value) == null) return 'Enter a valid amount';
+                  if (double.tryParse(value) == null)
+                    return 'Enter a valid amount';
                   return null;
                 },
               ),
@@ -150,9 +164,13 @@ class _RecordPaymentSheetState extends ConsumerState<_RecordPaymentSheet> {
                 decoration: const InputDecoration(labelText: 'Payment Method'),
                 items: [
                   for (final method in _paymentMethods)
-                    DropdownMenuItem(value: method, child: Text(method.replaceAll('_', ' '))),
+                    DropdownMenuItem(
+                      value: method,
+                      child: Text(method.replaceAll('_', ' ')),
+                    ),
                 ],
-                onChanged: (value) => setState(() => _method = value ?? _method),
+                onChanged: (value) =>
+                    setState(() => _method = value ?? _method),
               ),
               const SizedBox(height: 20),
               FilledButton(

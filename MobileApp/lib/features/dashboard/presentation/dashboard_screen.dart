@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:gymapp_member/core/api/repository_providers.dart';
+import 'package:gymapp_member/core/theme/app_tokens.dart';
 import 'package:gymapp_member/core/widgets/async_value_view.dart';
 import 'package:gymapp_member/core/widgets/expiry_badge.dart';
 import 'package:gymapp_member/features/auth/presentation/auth_controller.dart';
@@ -73,7 +74,8 @@ class _MembershipCard extends StatelessWidget {
               children: [
                 Text(
                   profile.fullName,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 ExpiryBadge(bucket: profile.expiryBucket),
               ],
@@ -82,13 +84,17 @@ class _MembershipCard extends StatelessWidget {
             Text(
               profile.memberCode,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const Divider(height: 32),
             Row(
               children: [
-                Icon(Icons.calendar_today_outlined, size: 18, color: Theme.of(context).colorScheme.primary),
+                Icon(
+                  Icons.calendar_today_outlined,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   endDate != null
@@ -101,7 +107,11 @@ class _MembershipCard extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(Icons.person_outline, size: 18, color: Theme.of(context).colorScheme.primary),
+                  Icon(
+                    Icons.person_outline,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   const SizedBox(width: 8),
                   Text('Trainer: ${profile.trainerName}'),
                 ],
@@ -131,21 +141,38 @@ class _QuickActionsGrid extends StatelessWidget {
       childAspectRatio: 2.2,
       children: [
         for (final action in _actions)
-          Card(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () => context.push(action.$1),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(action.$2, color: Theme.of(context).colorScheme.primary),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(action.$3, style: const TextStyle(fontWeight: FontWeight.w600))),
-                  ],
+          Builder(
+            builder: (context) {
+              final scheme = Theme.of(context).colorScheme;
+              final radius = context.tokens.radiusLg;
+              return Material(
+                color: scheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(radius),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(radius),
+                  onTap: () => context.push(action.$1),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: scheme.outline),
+                      borderRadius: BorderRadius.circular(radius),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(action.$2, color: scheme.primary),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            action.$3,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
       ],
     );
@@ -163,12 +190,15 @@ class _ExpiryNotice extends ConsumerWidget {
     if (bucket == ExpiryBucket.green) return const SizedBox.shrink();
 
     final message = switch (bucket) {
-      ExpiryBucket.red => 'Your membership has expired. Renew now to continue using the gym.',
+      ExpiryBucket.red =>
+        'Your membership has expired. Renew now to continue using the gym.',
       _ => 'Your membership is expiring soon. Renew now to avoid interruption.',
     };
 
+    final scheme = Theme.of(context).colorScheme;
+
     return Card(
-      color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.4),
+      color: scheme.error.withValues(alpha: 0.12),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -183,12 +213,16 @@ class _ExpiryNotice extends ConsumerWidget {
                   await repository.requestRenewal();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Renewal request sent to gym staff.')),
+                      const SnackBar(
+                        content: Text('Renewal request sent to gym staff.'),
+                      ),
                     );
                   }
                 } on Exception catch (error) {
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(error.toString())));
                   }
                 }
               },

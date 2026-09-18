@@ -18,7 +18,8 @@ class _CreateExpenseSheet extends ConsumerStatefulWidget {
   const _CreateExpenseSheet();
 
   @override
-  ConsumerState<_CreateExpenseSheet> createState() => _CreateExpenseSheetState();
+  ConsumerState<_CreateExpenseSheet> createState() =>
+      _CreateExpenseSheetState();
 }
 
 class _CreateExpenseSheetState extends ConsumerState<_CreateExpenseSheet> {
@@ -51,7 +52,9 @@ class _CreateExpenseSheetState extends ConsumerState<_CreateExpenseSheet> {
 
     setState(() => _isSaving = true);
     try {
-      await ref.read(expenseRepositoryProvider).create(
+      await ref
+          .read(expenseRepositoryProvider)
+          .create(
             ExpenseInput(
               category: _category,
               amount: double.parse(_amountController.text),
@@ -63,7 +66,8 @@ class _CreateExpenseSheetState extends ConsumerState<_CreateExpenseSheet> {
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -94,16 +98,20 @@ class _CreateExpenseSheetState extends ConsumerState<_CreateExpenseSheet> {
                 for (final category in expenseCategories)
                   DropdownMenuItem(value: category, child: Text(category)),
               ],
-              onChanged: (value) => setState(() => _category = value ?? _category),
+              onChanged: (value) =>
+                  setState(() => _category = value ?? _category),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: const InputDecoration(labelText: 'Amount'),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) return 'Required';
-                if (double.tryParse(value) == null) return 'Enter a valid amount';
+                if (double.tryParse(value) == null)
+                  return 'Enter a valid amount';
                 return null;
               },
             ),
@@ -118,7 +126,9 @@ class _CreateExpenseSheetState extends ConsumerState<_CreateExpenseSheet> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Description (optional)'),
+              decoration: const InputDecoration(
+                labelText: 'Description (optional)',
+              ),
             ),
             const SizedBox(height: 20),
             FilledButton(

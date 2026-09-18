@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:gymapp_member/core/widgets/app_list_card.dart';
 import 'package:gymapp_member/core/widgets/async_value_view.dart';
+import 'package:gymapp_member/core/widgets/empty_state.dart';
 import 'package:gymapp_member/features/progress/domain/progress_models.dart';
 import 'package:gymapp_member/features/progress/presentation/progress_providers.dart';
 
@@ -23,13 +25,9 @@ class ProgressScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(myProgressProvider),
           builder: (context, progress) {
             if (progress.measurements.isEmpty) {
-              return ListView(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: Text('No progress measurements recorded yet.')),
-                  ),
-                ],
+              return const EmptyState(
+                icon: Icons.show_chart,
+                message: 'No progress measurements recorded yet.',
               );
             }
 
@@ -42,11 +40,16 @@ class ProgressScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Weight Trend (kg)', style: Theme.of(context).textTheme.titleMedium),
+                        Text(
+                          'Weight Trend (kg)',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 16),
                         SizedBox(
                           height: 200,
-                          child: _WeightChart(measurements: progress.measurements),
+                          child: _WeightChart(
+                            measurements: progress.measurements,
+                          ),
                         ),
                       ],
                     ),
@@ -81,26 +84,50 @@ class _WeightChart extends StatelessWidget {
         .toList();
 
     if (points.isEmpty) {
-      return const Center(child: Text('No weight data yet.'));
+      return const EmptyState(
+        icon: Icons.show_chart,
+        message: 'No weight data yet.',
+      );
     }
+
+    final scheme = Theme.of(context).colorScheme;
+    final labelStyle = TextStyle(color: scheme.onSurfaceVariant, fontSize: 10);
 
     return LineChart(
       LineChartData(
-        gridData: const FlGridData(show: true, drawVerticalLine: false),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine: (_) =>
+              FlLine(color: scheme.outline, strokeWidth: 1),
+        ),
         titlesData: FlTitlesData(
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 32,
+              getTitlesWidget: (value, meta) =>
+                  Text(value.toStringAsFixed(0), style: labelStyle),
+            ),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= measurements.length) return const SizedBox.shrink();
+                if (index < 0 || index >= measurements.length)
+                  return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
                     DateFormat.Md().format(measurements[index].recordedDate),
-                    style: const TextStyle(fontSize: 10),
+                    style: labelStyle,
                   ),
                 );
               },
@@ -112,12 +139,19 @@ class _WeightChart extends StatelessWidget {
           LineChartBarData(
             spots: points,
             isCurved: true,
-            color: Theme.of(context).colorScheme.primary,
+            color: scheme.primary,
             barWidth: 3,
-            dotData: const FlDotData(show: true),
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
+                radius: 4,
+                color: scheme.primary,
+                strokeWidth: 0,
+              ),
+            ),
             belowBarData: BarAreaData(
               show: true,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              color: scheme.primary.withValues(alpha: 0.12),
             ),
           ),
         ],
@@ -136,15 +170,13 @@ class _MeasurementTile extends StatelessWidget {
     final stats = <String>[
       if (measurement.weightKg != null) '${measurement.weightKg} kg',
       if (measurement.bmi != null) 'BMI ${measurement.bmi}',
-      if (measurement.bodyFatPercent != null) '${measurement.bodyFatPercent}% fat',
+      if (measurement.bodyFatPercent != null)
+        '${measurement.bodyFatPercent}% fat',
     ];
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        title: Text(DateFormat.yMMMd().format(measurement.recordedDate)),
-        subtitle: Text(stats.join(' · ')),
-      ),
+    return AppListCard(
+      title: Text(DateFormat.yMMMd().format(measurement.recordedDate)),
+      subtitle: Text(stats.join(' · ')),
     );
   }
 }

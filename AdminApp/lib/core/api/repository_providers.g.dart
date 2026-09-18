@@ -605,3 +605,51 @@ final class EquipmentRepositoryProvider
 
 String _$equipmentRepositoryHash() =>
     r'5fe477c00ebe80e71b097c436f51f9753931213d';
+
+@ProviderFor(platformRepository)
+final platformRepositoryProvider = PlatformRepositoryProvider._();
+
+final class PlatformRepositoryProvider
+    extends
+        $FunctionalProvider<
+          PlatformRepository,
+          PlatformRepository,
+          PlatformRepository
+        >
+    with $Provider<PlatformRepository> {
+  PlatformRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'platformRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$platformRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<PlatformRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  PlatformRepository create(Ref ref) {
+    return platformRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PlatformRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PlatformRepository>(value),
+    );
+  }
+}
+
+String _$platformRepositoryHash() =>
+    r'88db2e9fe7aacf604617ebb9599475d025b300f0';

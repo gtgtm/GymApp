@@ -10,7 +10,9 @@ class TrialRepository {
   Future<List<Trial>> list() {
     return unwrap(
       () => _apiClient.dio.get('/trials'),
-      (data) => (data as List<dynamic>).map((json) => Trial.fromJson(json as Map<String, dynamic>)).toList(),
+      (data) => (data as List<dynamic>)
+          .map((json) => Trial.fromJson(json as Map<String, dynamic>))
+          .toList(),
     );
   }
 

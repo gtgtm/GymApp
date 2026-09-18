@@ -1,5 +1,9 @@
 class PaymentMemberRef {
-  const PaymentMemberRef({required this.id, required this.fullName, required this.memberCode});
+  const PaymentMemberRef({
+    required this.id,
+    required this.fullName,
+    required this.memberCode,
+  });
 
   factory PaymentMemberRef.fromJson(Map<String, dynamic> json) {
     return PaymentMemberRef(

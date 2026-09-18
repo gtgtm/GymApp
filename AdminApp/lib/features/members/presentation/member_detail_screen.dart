@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:gymapp_admin/core/widgets/app_list_card.dart';
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
+import 'package:gymapp_admin/core/widgets/empty_state.dart';
 import 'package:gymapp_admin/features/diet/presentation/diet_tab.dart';
 import 'package:gymapp_admin/features/members/domain/member_models.dart';
 import 'package:gymapp_admin/features/members/presentation/expiry_badge.dart';
@@ -74,9 +76,19 @@ class _InfoRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
-          Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w500))),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
         ],
       ),
     );
@@ -99,8 +111,14 @@ class _OverviewTab extends StatelessWidget {
         _InfoRow(label: 'Date of Birth', value: member.dateOfBirth ?? '—'),
         _InfoRow(label: 'Gender', value: member.gender ?? '—'),
         _InfoRow(label: 'Address', value: member.address ?? '—'),
-        _InfoRow(label: 'Emergency Contact', value: member.emergencyContactName ?? '—'),
-        _InfoRow(label: 'Emergency Phone', value: member.emergencyContactPhone ?? '—'),
+        _InfoRow(
+          label: 'Emergency Contact',
+          value: member.emergencyContactName ?? '—',
+        ),
+        _InfoRow(
+          label: 'Emergency Phone',
+          value: member.emergencyContactPhone ?? '—',
+        ),
         _InfoRow(label: 'Joining Date', value: member.joiningDate),
         _InfoRow(label: 'Trainer', value: member.trainer?.name ?? '—'),
         _InfoRow(label: 'Height (cm)', value: member.heightCm ?? '—'),
@@ -128,7 +146,10 @@ class _MembershipTab extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Current Membership', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Current Membership',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             ExpiryBadge(bucket: member.expiryBucket),
           ],
         ),
@@ -136,8 +157,18 @@ class _MembershipTab extends StatelessWidget {
         if (membership == null)
           const Text('No active membership.')
         else ...[
-          _InfoRow(label: 'Start Date', value: DateFormat('yyyy-MM-dd').parse(membership.startDate).let(dateFormat.format)),
-          _InfoRow(label: 'End Date', value: DateFormat('yyyy-MM-dd').parse(membership.endDate).let(dateFormat.format)),
+          _InfoRow(
+            label: 'Start Date',
+            value: DateFormat('yyyy-MM-dd')
+                .parse(membership.startDate)
+                .let(dateFormat.format),
+          ),
+          _InfoRow(
+            label: 'End Date',
+            value: DateFormat('yyyy-MM-dd')
+                .parse(membership.endDate)
+                .let(dateFormat.format),
+          ),
           _InfoRow(label: 'Status', value: membership.status),
         ],
         const SizedBox(height: 20),
@@ -170,18 +201,23 @@ class _PaymentsTab extends ConsumerWidget {
       onRetry: () => ref.invalidate(memberPaymentsProvider(memberId)),
       builder: (context, payments) {
         if (payments.isEmpty) {
-          return const Center(child: Text('No payments recorded yet.'));
+          return const EmptyState(
+            icon: Icons.payments_outlined,
+            message: 'No payments recorded yet.',
+          );
         }
-        return ListView.separated(
+        return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: payments.length,
-          separatorBuilder: (_, _) => const Divider(height: 1),
           itemBuilder: (context, index) {
             final payment = payments[index];
-            return ListTile(
+            return AppListCard(
               title: Text('₹${payment.amount}'),
               subtitle: Text('${payment.receiptNumber} · ${payment.method}'),
-              trailing: Text(dateFormat.format(DateTime.parse(payment.paidAt))),
+              trailing: Text(
+                dateFormat.format(DateTime.parse(payment.paidAt)),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             );
           },
         );

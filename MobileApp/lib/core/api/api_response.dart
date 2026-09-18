@@ -37,16 +37,14 @@ Future<T> unwrap<T>(
       );
     }
 
-    throw ApiException(
-      switch (error.type) {
-        DioExceptionType.connectionTimeout ||
-        DioExceptionType.receiveTimeout ||
-        DioExceptionType.sendTimeout =>
-          'The connection timed out. Please try again.',
-        DioExceptionType.connectionError => 'Could not reach the server. Check your connection.',
-        _ => 'Something went wrong. Please try again.',
-      },
-      statusCode: error.response?.statusCode,
-    );
+    throw ApiException(switch (error.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.receiveTimeout ||
+      DioExceptionType.sendTimeout =>
+        'The connection timed out. Please try again.',
+      DioExceptionType.connectionError =>
+        'Could not reach the server. Check your connection.',
+      _ => 'Something went wrong. Please try again.',
+    }, statusCode: error.response?.statusCode);
   }
 }

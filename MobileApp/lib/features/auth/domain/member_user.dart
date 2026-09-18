@@ -13,7 +13,8 @@ class MemberUser {
       name: json['name'] as String,
       email: json['email'] as String,
       gymName: (json['gym'] as Map<String, dynamic>?)?['name'] as String? ?? '',
-      roleName: (json['role'] as Map<String, dynamic>?)?['name'] as String? ?? '',
+      roleName:
+          (json['role'] as Map<String, dynamic>?)?['name'] as String? ?? '',
     );
   }
 

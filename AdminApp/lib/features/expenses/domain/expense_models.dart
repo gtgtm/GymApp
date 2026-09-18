@@ -53,7 +53,8 @@ class ExpenseInput {
       'category': category,
       'amount': amount,
       'expense_date': expenseDate,
-      if (description != null && description!.isNotEmpty) 'description': description,
+      if (description != null && description!.isNotEmpty)
+        'description': description,
     };
   }
 }

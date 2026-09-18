@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:gymapp_member/core/widgets/app_list_card.dart';
 import 'package:gymapp_member/core/widgets/async_value_view.dart';
+import 'package:gymapp_member/core/widgets/empty_state.dart';
+import 'package:gymapp_member/core/widgets/section_header.dart';
 import 'package:gymapp_member/features/auth/presentation/auth_controller.dart';
 import 'package:gymapp_member/features/membership/presentation/membership_providers.dart';
 import 'package:gymapp_member/features/payments/presentation/payment_providers.dart';
@@ -33,16 +36,17 @@ class ProfileScreen extends ConsumerWidget {
                     _InfoRow(label: 'Name', value: profile.fullName),
                     _InfoRow(label: 'Member Code', value: profile.memberCode),
                     _InfoRow(label: 'Mobile', value: profile.mobile),
-                    if (user != null) _InfoRow(label: 'Email', value: user.email),
-                    if (profile.trainerName != null) _InfoRow(label: 'Trainer', value: profile.trainerName!),
+                    if (user != null)
+                      _InfoRow(label: 'Email', value: user.email),
+                    if (profile.trainerName != null)
+                      _InfoRow(label: 'Trainer', value: profile.trainerName!),
                   ],
                 ),
               ),
             ),
           ),
           const SizedBox(height: 16),
-          Text('Payment History', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
+          const SectionHeader(title: 'Payment History'),
           AsyncValueView(
             value: paymentsAsync,
             onRetry: () => ref.invalidate(myPaymentsProvider),
@@ -50,19 +54,24 @@ class ProfileScreen extends ConsumerWidget {
               if (payments.isEmpty) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('No payments recorded yet.'),
+                  child: EmptyState(
+                    icon: Icons.payments_outlined,
+                    message: 'No payments recorded yet.',
+                  ),
                 );
               }
 
               return Column(
                 children: [
                   for (final payment in payments)
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        title: Text('₹${payment.amount.toStringAsFixed(2)}'),
-                        subtitle: Text('${payment.receiptNumber} · ${payment.method}'),
-                        trailing: Text(DateFormat.yMMMd().format(payment.paidAt)),
+                    AppListCard(
+                      title: Text('₹${payment.amount.toStringAsFixed(2)}'),
+                      subtitle: Text(
+                        '${payment.receiptNumber} · ${payment.method}',
+                      ),
+                      trailing: Text(
+                        DateFormat.yMMMd().format(payment.paidAt),
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                 ],
@@ -95,9 +104,19 @@ class _InfoRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 100,
-            child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
-          Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w500))),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
         ],
       ),
     );

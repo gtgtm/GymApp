@@ -12,7 +12,9 @@ class MemberNotification {
       id: json['id'] as int,
       title: json['title'] as String,
       body: json['body'] as String?,
-      readAt: json['read_at'] != null ? DateTime.parse(json['read_at'] as String) : null,
+      readAt: json['read_at'] != null
+          ? DateTime.parse(json['read_at'] as String)
+          : null,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }

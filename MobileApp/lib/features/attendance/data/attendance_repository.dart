@@ -11,7 +11,9 @@ class AttendanceRepository {
     return unwrap(
       () => _apiClient.dio.get('/me/attendance'),
       (data) => (data as List<dynamic>)
-          .map((item) => AttendanceRecord.fromJson(item as Map<String, dynamic>))
+          .map(
+            (item) => AttendanceRecord.fromJson(item as Map<String, dynamic>),
+          )
           .toList(),
     );
   }

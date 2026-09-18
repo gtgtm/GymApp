@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gymapp_admin/core/api/repository_providers.dart';
+import 'package:gymapp_admin/core/widgets/app_list_card.dart';
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
+import 'package:gymapp_admin/core/widgets/empty_state.dart';
+import 'package:gymapp_admin/core/widgets/stat_card.dart';
 import 'package:gymapp_admin/features/enquiries/domain/enquiry_models.dart';
 import 'package:gymapp_admin/features/enquiries/presentation/create_enquiry_sheet.dart';
 import 'package:gymapp_admin/features/enquiries/presentation/enquiry_providers.dart';
@@ -29,12 +32,15 @@ class _EnquiriesScreenState extends ConsumerState<EnquiriesScreen> {
 
   Future<void> _updateStatus(Enquiry enquiry, String status) async {
     try {
-      await ref.read(enquiryRepositoryProvider).updateStatus(enquiry.id, status);
+      await ref
+          .read(enquiryRepositoryProvider)
+          .updateStatus(enquiry.id, status);
       ref.invalidate(enquiryListProvider);
       ref.invalidate(conversionStatsProvider);
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     }
   }
@@ -58,22 +64,12 @@ class _EnquiriesScreenState extends ConsumerState<EnquiriesScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             statsAsync.when(
-              data: (stats) => Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Text(
-                        '${stats.conversionRate}%',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text('${stats.converted} converted of ${stats.total} total enquiries'),
-                      ),
-                    ],
-                  ),
-                ),
+              data: (stats) => StatCard(
+                label:
+                    '${stats.converted} converted of ${stats.total} total enquiries',
+                value: '${stats.conversionRate}%',
+                icon: Icons.trending_up,
+                tone: StatTone.success,
               ),
               loading: () => const LinearProgressIndicator(),
               error: (_, _) => const SizedBox.shrink(),
@@ -86,46 +82,31 @@ class _EnquiriesScreenState extends ConsumerState<EnquiriesScreen> {
                 if (enquiries.isEmpty) {
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text('No enquiries yet.')),
+                    child: EmptyState(
+                      icon: Icons.person_search_outlined,
+                      message: 'No enquiries yet.',
+                    ),
                   );
                 }
                 return Column(
                   children: [
                     for (final enquiry in enquiries)
-                      Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(enquiry.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                    Text(
-                                      enquiry.mobile,
-                                      style: Theme.of(context).textTheme.bodySmall,
-                                    ),
-                                  ],
-                                ),
+                      AppListCard(
+                        title: Text(enquiry.name),
+                        subtitle: Text(enquiry.mobile),
+                        trailing: DropdownButton<String>(
+                          value: enquiry.status,
+                          underline: const SizedBox.shrink(),
+                          items: [
+                            for (final status in enquiryStatuses)
+                              DropdownMenuItem(
+                                value: status,
+                                child: Text(status.replaceAll('_', ' ')),
                               ),
-                              DropdownButton<String>(
-                                value: enquiry.status,
-                                underline: const SizedBox.shrink(),
-                                items: [
-                                  for (final status in enquiryStatuses)
-                                    DropdownMenuItem(
-                                      value: status,
-                                      child: Text(status.replaceAll('_', ' ')),
-                                    ),
-                                ],
-                                onChanged: (value) {
-                                  if (value != null) _updateStatus(enquiry, value);
-                                },
-                              ),
-                            ],
-                          ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) _updateStatus(enquiry, value);
+                          },
                         ),
                       ),
                   ],

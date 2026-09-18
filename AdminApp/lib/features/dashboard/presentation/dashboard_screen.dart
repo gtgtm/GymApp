@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
+import 'package:gymapp_admin/core/widgets/stat_card.dart';
 import 'package:gymapp_admin/features/auth/presentation/auth_controller.dart';
 import 'package:gymapp_admin/features/dashboard/domain/dashboard_models.dart';
 import 'package:gymapp_admin/features/dashboard/presentation/dashboard_providers.dart';
 import 'package:gymapp_admin/features/dashboard/presentation/quick_actions.dart';
-import 'package:gymapp_admin/features/dashboard/presentation/stat_card.dart';
 import 'package:gymapp_admin/features/subscriptions/presentation/subscription_status_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -71,7 +72,11 @@ class _AdminDashboard extends StatelessWidget {
         const SizedBox(height: 20),
         _StatGrid(
           children: [
-            StatCard(label: 'Total Members', value: '${summary.totalMembers}', icon: Icons.people_outline),
+            StatCard(
+              label: 'Total Members',
+              value: '${summary.totalMembers}',
+              icon: Icons.people_outline,
+            ),
             StatCard(
               label: 'Active Members',
               value: '${summary.activeMembers}',
@@ -83,12 +88,14 @@ class _AdminDashboard extends StatelessWidget {
               value: '${summary.expiredMemberships}',
               icon: Icons.event_busy_outlined,
               tone: StatTone.danger,
+              onTap: () => context.push('/members?filter=expired'),
             ),
             StatCard(
               label: 'Expiring Soon',
               value: '${summary.expiringSoon}',
               icon: Icons.hourglass_bottom_outlined,
               tone: StatTone.warning,
+              onTap: () => context.push('/members?filter=expiring_soon'),
             ),
             StatCard(
               label: "Today's Attendance",
@@ -122,7 +129,9 @@ class _AdminDashboard extends StatelessWidget {
               label: 'Net Profit (Month)',
               value: _currency(summary.monthlyNetProfit),
               icon: Icons.show_chart,
-              tone: summary.monthlyNetProfit >= 0 ? StatTone.success : StatTone.danger,
+              tone: summary.monthlyNetProfit >= 0
+                  ? StatTone.success
+                  : StatTone.danger,
             ),
             StatCard(
               label: 'New Enquiries',
@@ -157,7 +166,11 @@ class _ReceptionistDashboard extends StatelessWidget {
         const SizedBox(height: 20),
         _StatGrid(
           children: [
-            StatCard(label: 'Total Members', value: '${summary.totalMembers}', icon: Icons.people_outline),
+            StatCard(
+              label: 'Total Members',
+              value: '${summary.totalMembers}',
+              icon: Icons.people_outline,
+            ),
             StatCard(
               label: 'Active Members',
               value: '${summary.activeMembers}',
@@ -169,6 +182,7 @@ class _ReceptionistDashboard extends StatelessWidget {
               value: '${summary.expiringSoon}',
               icon: Icons.hourglass_bottom_outlined,
               tone: StatTone.warning,
+              onTap: () => context.push('/members?filter=expiring_soon'),
             ),
             StatCard(
               label: "Today's Attendance",
@@ -185,6 +199,7 @@ class _ReceptionistDashboard extends StatelessWidget {
               value: '${summary.expiredMemberships}',
               icon: Icons.event_busy_outlined,
               tone: StatTone.danger,
+              onTap: () => context.push('/members?filter=expired'),
             ),
             StatCard(
               label: 'New Enquiries',
@@ -210,17 +225,24 @@ class _TrainerDashboard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Welcome, ${user?.name ?? ''}', style: Theme.of(context).textTheme.titleLarge),
+        Text(
+          'Welcome, ${user?.name ?? ''}',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
         const SizedBox(height: 4),
         Text(
           user?.roleLabel ?? 'Trainer',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: 20),
         const QuickActions(
-          exclude: ['/payments?new=1', '/plans?new=1', '/enquiries?new=1', '/expenses?new=1'],
+          exclude: [
+            '/payments?new=1',
+            '/plans?new=1',
+            '/enquiries?new=1',
+            '/expenses?new=1',
+          ],
         ),
         const SizedBox(height: 20),
         _StatGrid(

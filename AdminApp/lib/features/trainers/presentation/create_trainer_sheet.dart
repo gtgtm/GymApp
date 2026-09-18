@@ -17,7 +17,8 @@ class _CreateTrainerSheet extends ConsumerStatefulWidget {
   const _CreateTrainerSheet();
 
   @override
-  ConsumerState<_CreateTrainerSheet> createState() => _CreateTrainerSheetState();
+  ConsumerState<_CreateTrainerSheet> createState() =>
+      _CreateTrainerSheetState();
 }
 
 class _CreateTrainerSheetState extends ConsumerState<_CreateTrainerSheet> {
@@ -42,7 +43,9 @@ class _CreateTrainerSheetState extends ConsumerState<_CreateTrainerSheet> {
 
     setState(() => _isSaving = true);
     try {
-      await ref.read(trainerRepositoryProvider).create(
+      await ref
+          .read(trainerRepositoryProvider)
+          .create(
             TrainerInput(
               name: _nameController.text.trim(),
               email: _emailController.text.trim(),
@@ -54,7 +57,8 @@ class _CreateTrainerSheetState extends ConsumerState<_CreateTrainerSheet> {
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -81,14 +85,16 @@ class _CreateTrainerSheetState extends ConsumerState<_CreateTrainerSheet> {
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(labelText: 'Email'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -104,7 +110,9 @@ class _CreateTrainerSheetState extends ConsumerState<_CreateTrainerSheet> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _specializationController,
-              decoration: const InputDecoration(labelText: 'Specialization (optional)'),
+              decoration: const InputDecoration(
+                labelText: 'Specialization (optional)',
+              ),
             ),
             const SizedBox(height: 20),
             FilledButton(

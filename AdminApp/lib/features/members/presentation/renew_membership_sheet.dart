@@ -22,7 +22,8 @@ class _RenewMembershipSheet extends ConsumerStatefulWidget {
   final int memberId;
 
   @override
-  ConsumerState<_RenewMembershipSheet> createState() => _RenewMembershipSheetState();
+  ConsumerState<_RenewMembershipSheet> createState() =>
+      _RenewMembershipSheetState();
 }
 
 class _RenewMembershipSheetState extends ConsumerState<_RenewMembershipSheet> {
@@ -39,11 +40,14 @@ class _RenewMembershipSheetState extends ConsumerState<_RenewMembershipSheet> {
   }
 
   Future<void> _submit() async {
-    if (!(_formKey.currentState?.validate() ?? false) || _planId == null) return;
+    if (!(_formKey.currentState?.validate() ?? false) || _planId == null)
+      return;
 
     setState(() => _isSaving = true);
     try {
-      await ref.read(memberRepositoryProvider).renew(
+      await ref
+          .read(memberRepositoryProvider)
+          .renew(
             widget.memberId,
             RenewMembershipInput(
               membershipPlanId: _planId!,
@@ -54,13 +58,13 @@ class _RenewMembershipSheetState extends ConsumerState<_RenewMembershipSheet> {
       ref.invalidate(memberDetailProvider(widget.memberId));
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Membership renewed.')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Membership renewed.')));
       }
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -84,7 +88,10 @@ class _RenewMembershipSheetState extends ConsumerState<_RenewMembershipSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Renew Membership', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Renew Membership',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 16),
             plansAsync.when(
               data: (plans) => DropdownButtonFormField<int>(
@@ -92,7 +99,10 @@ class _RenewMembershipSheetState extends ConsumerState<_RenewMembershipSheet> {
                 decoration: const InputDecoration(labelText: 'Membership Plan'),
                 items: [
                   for (final plan in plans)
-                    DropdownMenuItem(value: plan.id, child: Text('${plan.name} (₹${plan.totalAmount})')),
+                    DropdownMenuItem(
+                      value: plan.id,
+                      child: Text('${plan.name} (₹${plan.totalAmount})'),
+                    ),
                 ],
                 onChanged: (value) => setState(() => _planId = value),
                 validator: (value) => value == null ? 'Select a plan' : null,
@@ -103,11 +113,14 @@ class _RenewMembershipSheetState extends ConsumerState<_RenewMembershipSheet> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: const InputDecoration(labelText: 'Amount Paid'),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) return 'Required';
-                if (double.tryParse(value) == null) return 'Enter a valid amount';
+                if (double.tryParse(value) == null)
+                  return 'Enter a valid amount';
                 return null;
               },
             ),
@@ -117,9 +130,13 @@ class _RenewMembershipSheetState extends ConsumerState<_RenewMembershipSheet> {
               decoration: const InputDecoration(labelText: 'Payment Method'),
               items: [
                 for (final method in _paymentMethods)
-                  DropdownMenuItem(value: method, child: Text(method.replaceAll('_', ' '))),
+                  DropdownMenuItem(
+                    value: method,
+                    child: Text(method.replaceAll('_', ' ')),
+                  ),
               ],
-              onChanged: (value) => setState(() => _paymentMethod = value ?? _paymentMethod),
+              onChanged: (value) =>
+                  setState(() => _paymentMethod = value ?? _paymentMethod),
             ),
             const SizedBox(height: 20),
             FilledButton(

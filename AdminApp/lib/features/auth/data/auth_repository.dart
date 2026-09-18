@@ -6,14 +6,19 @@ import 'package:gymapp_admin/core/permissions/nav_permissions.dart';
 import 'package:gymapp_admin/features/auth/domain/staff_user.dart';
 
 class AuthRepository {
-  AuthRepository({required ApiClient apiClient, required TokenStorage tokenStorage})
-      : _apiClient = apiClient,
-        _tokenStorage = tokenStorage;
+  AuthRepository({
+    required ApiClient apiClient,
+    required TokenStorage tokenStorage,
+  }) : _apiClient = apiClient,
+       _tokenStorage = tokenStorage;
 
   final ApiClient _apiClient;
   final TokenStorage _tokenStorage;
 
-  Future<StaffUser> login({required String email, required String password}) async {
+  Future<StaffUser> login({
+    required String email,
+    required String password,
+  }) async {
     final result = await unwrap(
       () => _apiClient.dio.post(
         '/login',

@@ -61,7 +61,8 @@ class TrainerInput {
       'email': email,
       'password': password,
       if (phone != null && phone!.isNotEmpty) 'phone': phone,
-      if (specialization != null && specialization!.isNotEmpty) 'specialization': specialization,
+      if (specialization != null && specialization!.isNotEmpty)
+        'specialization': specialization,
     };
   }
 }

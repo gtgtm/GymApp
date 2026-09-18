@@ -17,7 +17,8 @@ class _CreateEquipmentSheet extends ConsumerStatefulWidget {
   const _CreateEquipmentSheet();
 
   @override
-  ConsumerState<_CreateEquipmentSheet> createState() => _CreateEquipmentSheetState();
+  ConsumerState<_CreateEquipmentSheet> createState() =>
+      _CreateEquipmentSheetState();
 }
 
 class _CreateEquipmentSheetState extends ConsumerState<_CreateEquipmentSheet> {
@@ -39,7 +40,9 @@ class _CreateEquipmentSheetState extends ConsumerState<_CreateEquipmentSheet> {
 
     setState(() => _isSaving = true);
     try {
-      await ref.read(equipmentRepositoryProvider).create(
+      await ref
+          .read(equipmentRepositoryProvider)
+          .create(
             EquipmentInput(
               name: _nameController.text.trim(),
               category: _categoryController.text.trim(),
@@ -50,7 +53,8 @@ class _CreateEquipmentSheetState extends ConsumerState<_CreateEquipmentSheet> {
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -72,17 +76,23 @@ class _CreateEquipmentSheetState extends ConsumerState<_CreateEquipmentSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Add Equipment', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Add Equipment',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _categoryController,
-              decoration: const InputDecoration(labelText: 'Category (optional)'),
+              decoration: const InputDecoration(
+                labelText: 'Category (optional)',
+              ),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
@@ -90,9 +100,13 @@ class _CreateEquipmentSheetState extends ConsumerState<_CreateEquipmentSheet> {
               decoration: const InputDecoration(labelText: 'Condition'),
               items: [
                 for (final condition in equipmentConditions)
-                  DropdownMenuItem(value: condition, child: Text(condition.replaceAll('_', ' '))),
+                  DropdownMenuItem(
+                    value: condition,
+                    child: Text(condition.replaceAll('_', ' ')),
+                  ),
               ],
-              onChanged: (value) => setState(() => _condition = value ?? _condition),
+              onChanged: (value) =>
+                  setState(() => _condition = value ?? _condition),
             ),
             const SizedBox(height: 20),
             FilledButton(

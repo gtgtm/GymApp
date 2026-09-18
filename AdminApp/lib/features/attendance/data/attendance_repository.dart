@@ -22,12 +22,17 @@ class AttendanceRepository {
   }
 
   Future<MarkAttendanceResult> markByMemberId(int memberId) {
-    return _markAttendance(() => _apiClient.dio.post('/attendance', data: {'member_id': memberId}));
+    return _markAttendance(
+      () => _apiClient.dio.post('/attendance', data: {'member_id': memberId}),
+    );
   }
 
   Future<MarkAttendanceResult> scanQr(String qrToken) {
     return _markAttendance(
-      () => _apiClient.dio.post('/attendance/scan-qr', data: {'qr_token': qrToken}),
+      () => _apiClient.dio.post(
+        '/attendance/scan-qr',
+        data: {'qr_token': qrToken},
+      ),
     );
   }
 
@@ -37,18 +42,23 @@ class AttendanceRepository {
     try {
       final response = await request();
       final body = response.data as Map<String, dynamic>;
-      return MarkAttendanceResult.fromJson(body['data'] as Map<String, dynamic>);
+      return MarkAttendanceResult.fromJson(
+        body['data'] as Map<String, dynamic>,
+      );
     } on DioException catch (error) {
       final body = error.response?.data;
       if (body is Map<String, dynamic> && error.response?.statusCode == 422) {
         final errorBody = body['error'] as Map<String, dynamic>?;
         final errors = errorBody?['errors'] as Map<String, dynamic>?;
         throw MembershipExpiredException(
-          message: errorBody?['message'] as String? ?? 'Membership has expired.',
+          message:
+              errorBody?['message'] as String? ?? 'Membership has expired.',
           membershipEndDate: errors?['membership_end_date'] as String?,
           member: errors?['member'] == null
               ? null
-              : AttendanceMemberRef.fromJson(errors!['member'] as Map<String, dynamic>),
+              : AttendanceMemberRef.fromJson(
+                  errors!['member'] as Map<String, dynamic>,
+                ),
         );
       }
       if (body is Map<String, dynamic> && body['error'] != null) {

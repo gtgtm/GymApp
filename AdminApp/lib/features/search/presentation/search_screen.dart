@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:gymapp_admin/core/widgets/empty_state.dart';
+import 'package:gymapp_admin/core/widgets/section_header.dart';
+import 'package:gymapp_admin/core/widgets/status_badge.dart';
 import 'package:gymapp_admin/features/search/presentation/search_providers.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -40,10 +43,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       body: resultsAsync.when(
         data: (results) {
           if (_query.trim().length < 2) {
-            return const Center(child: Text('Type at least 2 characters to search.'));
+            return const EmptyState(
+              icon: Icons.search,
+              message: 'Type at least 2 characters to search.',
+            );
           }
           if (results.isEmpty) {
-            return const Center(child: Text('No results found.'));
+            return const EmptyState(
+              icon: Icons.search_off,
+              message: 'No results found.',
+            );
           }
           return ListView(
             children: [
@@ -54,7 +63,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     for (final member in results.members)
                       ListTile(
                         title: Text(member.fullName),
-                        subtitle: Text('${member.mobile} · ${member.memberCode}'),
+                        subtitle: Text(
+                          '${member.mobile} · ${member.memberCode}',
+                        ),
                         onTap: () => context.push('/members/${member.id}'),
                       ),
                   ],
@@ -64,7 +75,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   label: 'Trainers',
                   children: [
                     for (final trainer in results.trainers)
-                      ListTile(title: Text(trainer.name), subtitle: Text(trainer.phone ?? '')),
+                      ListTile(
+                        title: Text(trainer.name),
+                        subtitle: Text(trainer.phone ?? ''),
+                      ),
                   ],
                 ),
               if (results.payments.isNotEmpty)
@@ -85,7 +99,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     for (final enquiry in results.enquiries)
                       ListTile(
                         title: Text(enquiry.name),
-                        trailing: Chip(label: Text(enquiry.status), visualDensity: VisualDensity.compact),
+                        trailing: StatusBadge(
+                          label: enquiry.status,
+                          tone: StatusTone.info,
+                        ),
                       ),
                   ],
                 ),
@@ -111,14 +128,8 @@ class _ResultGroup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-          child: Text(
-            label,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
-          ),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: SectionHeader(title: label),
         ),
         ...children,
       ],

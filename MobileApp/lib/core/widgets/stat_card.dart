@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:gymapp_member/core/theme/app_tokens.dart';
+
 enum StatTone { normal, success, warning, danger }
 
 class StatCard extends StatelessWidget {
@@ -16,10 +18,12 @@ class StatCard extends StatelessWidget {
   final IconData icon;
   final StatTone tone;
 
-  Color _toneColor(ColorScheme scheme) {
+  Color _toneColor(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tokens = context.tokens;
     return switch (tone) {
-      StatTone.success => Colors.green,
-      StatTone.warning => Colors.amber,
+      StatTone.success => tokens.success,
+      StatTone.warning => tokens.warning,
       StatTone.danger => scheme.error,
       StatTone.normal => scheme.primary,
     };
@@ -28,7 +32,7 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final toneColor = _toneColor(scheme);
+    final toneColor = _toneColor(context);
 
     return Card(
       child: Padding(
@@ -42,21 +46,23 @@ class StatCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
+                    style: Theme.of(context).textTheme.bodySmall
                         ?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ),
                 CircleAvatar(
                   radius: 14,
-                  backgroundColor: toneColor.withValues(alpha: 0.12),
+                  backgroundColor: toneColor.withValues(alpha: 0.14),
                   child: Icon(icon, size: 16, color: toneColor),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            Text(value, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.w700),
+            ),
           ],
         ),
       ),

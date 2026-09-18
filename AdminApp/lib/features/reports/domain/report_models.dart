@@ -7,12 +7,15 @@ class FinancialSummary {
   });
 
   factory FinancialSummary.fromJson(Map<String, dynamic> json) {
-    final breakdown = json['payment_method_breakdown'] as Map<String, dynamic>? ?? {};
+    final breakdown =
+        json['payment_method_breakdown'] as Map<String, dynamic>? ?? {};
     return FinancialSummary(
       revenue: _asDouble(json['revenue']),
       expenses: _asDouble(json['expenses']),
       profit: _asDouble(json['profit']),
-      paymentMethodBreakdown: breakdown.map((key, value) => MapEntry(key, _asDouble(value))),
+      paymentMethodBreakdown: breakdown.map(
+        (key, value) => MapEntry(key, _asDouble(value)),
+      ),
     );
   }
 

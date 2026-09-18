@@ -9,7 +9,10 @@ class WorkoutRepository {
 
   Future<List<WorkoutPlan>> list(int memberId) {
     return unwrap(
-      () => _apiClient.dio.get('/workout-plans', queryParameters: {'member_id': memberId}),
+      () => _apiClient.dio.get(
+        '/workout-plans',
+        queryParameters: {'member_id': memberId},
+      ),
       (data) => (data as List<dynamic>)
           .map((json) => WorkoutPlan.fromJson(json as Map<String, dynamic>))
           .toList(),
@@ -24,6 +27,9 @@ class WorkoutRepository {
   }
 
   Future<void> delete(int id) {
-    return unwrap(() => _apiClient.dio.delete('/workout-plans/$id'), (_) => null);
+    return unwrap(
+      () => _apiClient.dio.delete('/workout-plans/$id'),
+      (_) => null,
+    );
   }
 }

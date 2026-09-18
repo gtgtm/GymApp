@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\ActingGymContext;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -57,6 +58,20 @@ class User extends Authenticatable
 
     public function hasRole(string ...$roles): bool
     {
-        return $this->role && in_array($this->role->name, $roles, true);
+        if (! $this->role) {
+            return false;
+        }
+
+        if (in_array($this->role->name, $roles, true)) {
+            return true;
+        }
+
+        // A super_admin acting as a specific gym (see ResolveActingGym
+        // middleware) is treated as that gym's admin everywhere hasRole()
+        // is checked — route middleware, FormRequest::authorize(), and
+        // controllers alike — so it never needs bypassing case by case.
+        return $this->role->name === Role::SUPER_ADMIN
+            && in_array(Role::ADMIN, $roles, true)
+            && app(ActingGymContext::class)->gymId() !== null;
     }
 }

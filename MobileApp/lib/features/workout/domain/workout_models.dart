@@ -21,7 +21,9 @@ class WorkoutExercise {
       muscleGroup: json['muscle_group'] as String?,
       sets: json['sets'] as int?,
       reps: json['reps'] as String?,
-      weightKg: json['weight_kg'] != null ? double.tryParse(json['weight_kg'].toString()) : null,
+      weightKg: json['weight_kg'] != null
+          ? double.tryParse(json['weight_kg'].toString())
+          : null,
       restSeconds: json['rest_seconds'] as int?,
       instructions: json['instructions'] as String?,
       videoUrl: json['video_url'] as String?,
@@ -56,7 +58,9 @@ class WorkoutPlan {
       id: json['id'] as int,
       name: json['name'] as String,
       status: json['status'] as String,
-      trainerName: (json['trainer'] as Map<String, dynamic>?)?['user']?['name'] as String?,
+      trainerName:
+          (json['trainer'] as Map<String, dynamic>?)?['user']?['name']
+              as String?,
       exercises: (json['exercises'] as List<dynamic>? ?? [])
           .map((item) => WorkoutExercise.fromJson(item as Map<String, dynamic>))
           .toList(),

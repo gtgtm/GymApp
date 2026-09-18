@@ -42,11 +42,34 @@ class _QrScannerViewState extends State<QrScannerView> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(20),
       child: AspectRatio(
         aspectRatio: 1,
-        child: MobileScanner(controller: _controller, onDetect: _handleDetection),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            MobileScanner(
+              controller: _controller,
+              onDetect: _handleDetection,
+              errorBuilder: (context, error, child) =>
+                  _ScannerError(error: error),
+            ),
+            IgnorePointer(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: scheme.primary, width: 3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -54,4 +77,40 @@ class _QrScannerViewState extends State<QrScannerView> {
 
 extension _FirstOrNull<T> on List<T> {
   T? get firstOrNull => isEmpty ? null : first;
+}
+
+class _ScannerError extends StatelessWidget {
+  const _ScannerError({required this.error});
+
+  final MobileScannerException error;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final message = switch (error.errorCode) {
+      MobileScannerErrorCode.permissionDenied => 'Camera permission denied. Enable it in system settings to scan QR codes.',
+      _ => 'Could not start the camera.',
+    };
+
+    return ColoredBox(
+      color: scheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.videocam_off_outlined, color: scheme.error, size: 32),
+              const SizedBox(height: 12),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: scheme.onSurfaceVariant),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

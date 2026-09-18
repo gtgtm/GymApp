@@ -15,6 +15,8 @@ import 'package:gymapp_admin/features/members/presentation/member_detail_screen.
 import 'package:gymapp_admin/features/members/presentation/members_screen.dart';
 import 'package:gymapp_admin/features/payments/presentation/payments_screen.dart';
 import 'package:gymapp_admin/features/plans/presentation/plans_screen.dart';
+import 'package:gymapp_admin/features/platform/presentation/acting_gym_controller.dart';
+import 'package:gymapp_admin/features/platform/presentation/gyms_screen.dart';
 import 'package:gymapp_admin/features/reports/presentation/reports_screen.dart';
 import 'package:gymapp_admin/features/search/presentation/search_screen.dart';
 import 'package:gymapp_admin/features/trainers/presentation/trainers_screen.dart';
@@ -25,6 +27,7 @@ part 'app_router.g.dart';
 class _AuthRefreshListenable extends ChangeNotifier {
   _AuthRefreshListenable(Ref ref) {
     ref.listen(authControllerProvider, (_, _) => notifyListeners());
+    ref.listen(actingGymControllerProvider, (_, _) => notifyListeners());
   }
 }
 
@@ -37,24 +40,41 @@ GoRouter appRouter(Ref ref) {
     refreshListenable: refreshListenable,
     redirect: (context, state) {
       final authState = ref.read(authControllerProvider);
-      final isLoggedIn = authState.value != null;
+      final user = authState.value;
+      final isLoggedIn = user != null;
       final isLoggingIn = state.matchedLocation == '/login';
+      final isGymsScreen = state.matchedLocation == '/gyms';
 
       if (authState.isLoading) return null;
       if (!isLoggedIn && !isLoggingIn) return '/login';
-      if (isLoggedIn && isLoggingIn) return '/dashboard';
+      if (isLoggedIn && isLoggingIn) {
+        return user.isSuperAdmin ? '/gyms' : '/dashboard';
+      }
+
+      // super_admin has no gym of its own — every gym-scoped screen requires
+      // having entered one first via the gym directory (see GymsScreen).
+      final hasEnteredGym = ref.read(actingGymControllerProvider) != null;
+      if (isLoggedIn && user.isSuperAdmin && !hasEnteredGym && !isGymsScreen) {
+        return '/gyms';
+      }
+
       return null;
     },
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(path: '/gyms', builder: (context, state) => const GymsScreen()),
       ShellRoute(
         builder: (context, state, child) => StaffShell(child: child),
         routes: [
-          GoRoute(path: '/dashboard', builder: (context, state) => const DashboardScreen()),
+          GoRoute(
+            path: '/dashboard',
+            builder: (context, state) => const DashboardScreen(),
+          ),
           GoRoute(
             path: '/members',
             builder: (context, state) => MembersScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
+              expiryFilter: state.uri.queryParameters['filter'],
             ),
           ),
           GoRoute(

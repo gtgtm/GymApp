@@ -12,7 +12,8 @@ class BodyMeasurement {
   });
 
   factory BodyMeasurement.fromJson(Map<String, dynamic> json) {
-    double? parse(dynamic value) => value != null ? double.tryParse(value.toString()) : null;
+    double? parse(dynamic value) =>
+        value != null ? double.tryParse(value.toString()) : null;
 
     return BodyMeasurement(
       recordedDate: DateTime.parse(json['recorded_date'] as String),

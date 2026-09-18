@@ -26,4 +26,6 @@ class StaffUser {
   final String gymName;
   final String roleName;
   final String roleLabel;
+
+  bool get isSuperAdmin => roleName == 'super_admin';
 }

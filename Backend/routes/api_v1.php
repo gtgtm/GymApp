@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\MemberPortalController;
 use App\Http\Controllers\Api\V1\MembershipPlanController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\PlatformController;
 use App\Http\Controllers\Api\V1\ProgressPhotoController;
 use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
@@ -25,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
-Route::middleware('auth:sanctum')->group(function (): void {
+Route::middleware(['auth:sanctum', 'acting_gym', 'bindings'])->group(function (): void {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 
@@ -40,6 +41,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::middleware('role:super_admin')->group(function (): void {
         Route::get('subscriptions', [SubscriptionController::class, 'index']);
         Route::post('subscriptions', [SubscriptionController::class, 'store']);
+
+        Route::get('platform/gyms', [PlatformController::class, 'gyms']);
+        Route::get('platform/gyms/{gym}', [PlatformController::class, 'gym']);
     });
 
     // Member-facing surface: a member sees only their own records, resolved

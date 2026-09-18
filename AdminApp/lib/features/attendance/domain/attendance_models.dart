@@ -1,5 +1,9 @@
 class AttendanceMemberRef {
-  const AttendanceMemberRef({required this.id, required this.fullName, required this.memberCode});
+  const AttendanceMemberRef({
+    required this.id,
+    required this.fullName,
+    required this.memberCode,
+  });
 
   factory AttendanceMemberRef.fromJson(Map<String, dynamic> json) {
     return AttendanceMemberRef(
@@ -27,7 +31,9 @@ class AttendanceEntry {
       id: json['id'] as int,
       member: json['member'] == null
           ? null
-          : AttendanceMemberRef.fromJson(json['member'] as Map<String, dynamic>),
+          : AttendanceMemberRef.fromJson(
+              json['member'] as Map<String, dynamic>,
+            ),
       checkInTime: json['check_in_time'] as String?,
       status: json['status'] as String,
     );
@@ -47,7 +53,9 @@ class MarkAttendanceResult {
       membershipEndDate: json['membership_end_date'] as String?,
       member: json['member'] == null
           ? null
-          : AttendanceMemberRef.fromJson(json['member'] as Map<String, dynamic>),
+          : AttendanceMemberRef.fromJson(
+              json['member'] as Map<String, dynamic>,
+            ),
     );
   }
 

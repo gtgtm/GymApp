@@ -15,20 +15,23 @@ export type NavKey =
   | "equipment"
   | "reports";
 
+const ALL_NAV_KEYS: NavKey[] = [
+  "dashboard",
+  "members",
+  "trainers",
+  "plans",
+  "payments",
+  "attendance",
+  "enquiries",
+  "trials",
+  "expenses",
+  "equipment",
+  "reports",
+];
+
 const ROLE_NAV_ACCESS: Record<RoleName, NavKey[]> = {
-  admin: [
-    "dashboard",
-    "members",
-    "trainers",
-    "plans",
-    "payments",
-    "attendance",
-    "enquiries",
-    "trials",
-    "expenses",
-    "equipment",
-    "reports",
-  ],
+  super_admin: ALL_NAV_KEYS,
+  admin: ALL_NAV_KEYS,
   receptionist: ["dashboard", "members", "payments", "attendance", "enquiries", "trials"],
   trainer: ["dashboard", "members", "attendance"],
   member: [],
@@ -36,7 +39,7 @@ const ROLE_NAV_ACCESS: Record<RoleName, NavKey[]> = {
 
 export function canAccessNav(role: RoleName | undefined, key: NavKey): boolean {
   if (!role) return false;
-  return ROLE_NAV_ACCESS[role].includes(key);
+  return (ROLE_NAV_ACCESS[role] ?? []).includes(key);
 }
 
 const ROUTE_NAV_KEY: Record<string, NavKey> = {

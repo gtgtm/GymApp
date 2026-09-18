@@ -46,13 +46,22 @@ class WorkoutTab extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(plan.name, style: Theme.of(context).textTheme.titleMedium),
-                            Chip(label: Text(plan.status), visualDensity: VisualDensity.compact),
+                            Text(
+                              plan.name,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Chip(
+                              label: Text(plan.status),
+                              visualDensity: VisualDensity.compact,
+                            ),
                           ],
                         ),
                         const Divider(height: 20),
                         for (final day in sortedDays) ...[
-                          Text('Day $day', style: const TextStyle(fontWeight: FontWeight.w600)),
+                          Text(
+                            'Day $day',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
                           for (final line in byDay[day]!)
                             Padding(
                               padding: const EdgeInsets.only(left: 8, top: 2),

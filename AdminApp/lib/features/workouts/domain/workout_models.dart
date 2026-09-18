@@ -19,7 +19,9 @@ class WorkoutExercise {
       muscleGroup: json['muscle_group'] as String?,
       sets: json['sets'] as int?,
       reps: json['reps'] as String?,
-      weightKg: json['weight_kg'] == null ? null : num.parse('${json['weight_kg']}').toDouble(),
+      weightKg: json['weight_kg'] == null
+          ? null
+          : num.parse('${json['weight_kg']}').toDouble(),
       restSeconds: json['rest_seconds'] as int?,
       instructions: json['instructions'] as String?,
     );
@@ -40,12 +42,14 @@ class WorkoutExercise {
       'day_number': dayNumber,
       if (dayLabel != null && dayLabel!.isNotEmpty) 'day_label': dayLabel,
       'exercise_name': exerciseName,
-      if (muscleGroup != null && muscleGroup!.isNotEmpty) 'muscle_group': muscleGroup,
+      if (muscleGroup != null && muscleGroup!.isNotEmpty)
+        'muscle_group': muscleGroup,
       if (sets != null) 'sets': sets,
       if (reps != null && reps!.isNotEmpty) 'reps': reps,
       if (weightKg != null) 'weight_kg': weightKg,
       if (restSeconds != null) 'rest_seconds': restSeconds,
-      if (instructions != null && instructions!.isNotEmpty) 'instructions': instructions,
+      if (instructions != null && instructions!.isNotEmpty)
+        'instructions': instructions,
     };
   }
 }

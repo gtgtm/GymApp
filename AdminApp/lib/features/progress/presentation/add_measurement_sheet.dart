@@ -20,7 +20,8 @@ class _AddMeasurementSheet extends ConsumerStatefulWidget {
   final int memberId;
 
   @override
-  ConsumerState<_AddMeasurementSheet> createState() => _AddMeasurementSheetState();
+  ConsumerState<_AddMeasurementSheet> createState() =>
+      _AddMeasurementSheetState();
 }
 
 class _AddMeasurementSheetState extends ConsumerState<_AddMeasurementSheet> {
@@ -49,7 +50,9 @@ class _AddMeasurementSheetState extends ConsumerState<_AddMeasurementSheet> {
   Future<void> _submit() async {
     setState(() => _isSaving = true);
     try {
-      await ref.read(progressRepositoryProvider).addMeasurement(
+      await ref
+          .read(progressRepositoryProvider)
+          .addMeasurement(
             BodyMeasurementInput(
               memberId: widget.memberId,
               recordedDate: DateFormat('yyyy-MM-dd').format(_recordedDate),
@@ -61,7 +64,8 @@ class _AddMeasurementSheetState extends ConsumerState<_AddMeasurementSheet> {
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -81,7 +85,10 @@ class _AddMeasurementSheetState extends ConsumerState<_AddMeasurementSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Add Measurement', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'Add Measurement',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 16),
           InkWell(
             onTap: _pickDate,

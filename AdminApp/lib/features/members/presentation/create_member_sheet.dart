@@ -42,7 +42,9 @@ class _CreateMemberSheetState extends ConsumerState<_CreateMemberSheet> {
 
     setState(() => _isSaving = true);
     try {
-      await ref.read(memberRepositoryProvider).create(
+      await ref
+          .read(memberRepositoryProvider)
+          .create(
             MemberInput(
               fullName: _nameController.text.trim(),
               mobile: _mobileController.text.trim(),
@@ -54,7 +56,8 @@ class _CreateMemberSheetState extends ConsumerState<_CreateMemberSheet> {
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -91,14 +94,16 @@ class _CreateMemberSheetState extends ConsumerState<_CreateMemberSheet> {
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Full Name'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _mobileController,
               keyboardType: TextInputType.phone,
               decoration: const InputDecoration(labelText: 'Mobile Number'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(

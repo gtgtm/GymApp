@@ -31,7 +31,8 @@ class DietMeal {
   });
 
   factory DietMeal.fromJson(Map<String, dynamic> json) {
-    double? asDouble(dynamic value) => value == null ? null : num.parse('$value').toDouble();
+    double? asDouble(dynamic value) =>
+        value == null ? null : num.parse('$value').toDouble();
     return DietMeal(
       mealSlot: json['meal_slot'] as String,
       foodItem: json['food_item'] as String,

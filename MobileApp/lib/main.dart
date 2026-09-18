@@ -17,7 +17,8 @@ class GymAppMember extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'GymBrain Member',
-      theme: AppTheme.light(),
+      theme: AppTheme.dark(),
+      themeMode: ThemeMode.dark,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );

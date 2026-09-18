@@ -22,7 +22,7 @@ export type ApiResponse<T> = ApiSuccess<T> | ApiFailure;
 
 export interface Role {
   id: number;
-  name: "admin" | "receptionist" | "trainer" | "member";
+  name: "super_admin" | "admin" | "receptionist" | "trainer" | "member";
   label: string;
 }
 
@@ -45,7 +45,7 @@ export interface AuthUser {
   phone: string | null;
   status: string;
   role: Role;
-  gym: Gym;
+  gym: Gym | null;
 }
 
 export type ExpiryBucket = "green" | "yellow" | "orange" | "red";

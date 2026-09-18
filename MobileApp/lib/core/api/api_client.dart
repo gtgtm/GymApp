@@ -14,16 +14,18 @@ const apiBaseUrl = String.fromEnvironment(
 typedef UnauthorizedCallback = void Function();
 
 class ApiClient {
-  ApiClient({required TokenStorage tokenStorage, UnauthorizedCallback? onUnauthorized})
-      : _tokenStorage = tokenStorage,
-        _dio = Dio(
-          BaseOptions(
-            baseUrl: apiBaseUrl,
-            connectTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 20),
-            headers: {'Accept': 'application/json'},
-          ),
-        ) {
+  ApiClient({
+    required TokenStorage tokenStorage,
+    UnauthorizedCallback? onUnauthorized,
+  }) : _tokenStorage = tokenStorage,
+       _dio = Dio(
+         BaseOptions(
+           baseUrl: apiBaseUrl,
+           connectTimeout: const Duration(seconds: 10),
+           receiveTimeout: const Duration(seconds: 20),
+           headers: {'Accept': 'application/json'},
+         ),
+       ) {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {

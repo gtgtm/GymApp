@@ -19,6 +19,7 @@ class AuthController extends _$AuthController {
   @override
   Future<StaffUser?> build() async {
     ref.read(unauthorizedHubProvider).register(() {
+      ref.read(actingGymHubProvider).clear();
       state = const AsyncData(null);
     });
 
@@ -26,14 +27,18 @@ class AuthController extends _$AuthController {
   }
 
   Future<void> login({required String email, required String password}) async {
+    ref.read(actingGymHubProvider).clear();
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () => ref.read(authRepositoryProvider).login(email: email, password: password),
+      () => ref
+          .read(authRepositoryProvider)
+          .login(email: email, password: password),
     );
   }
 
   Future<void> logout() async {
     await ref.read(authRepositoryProvider).logout();
+    ref.read(actingGymHubProvider).clear();
     state = const AsyncData(null);
   }
 }

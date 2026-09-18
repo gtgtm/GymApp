@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:gymapp_admin/core/widgets/app_list_card.dart';
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
+import 'package:gymapp_admin/core/widgets/empty_state.dart';
+import 'package:gymapp_admin/core/widgets/status_badge.dart';
 import 'package:gymapp_admin/features/plans/presentation/create_plan_sheet.dart';
 import 'package:gymapp_admin/features/plans/presentation/plan_providers.dart';
 
@@ -39,7 +42,10 @@ class _PlansScreenState extends ConsumerState<PlansScreen> {
         onRetry: () => ref.invalidate(planListProvider),
         builder: (context, plans) {
           if (plans.isEmpty) {
-            return const Center(child: Text('No membership plans yet.'));
+            return const EmptyState(
+              icon: Icons.assignment_outlined,
+              message: 'No membership plans yet.',
+            );
           }
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(planListProvider),
@@ -48,25 +54,16 @@ class _PlansScreenState extends ConsumerState<PlansScreen> {
               itemCount: plans.length,
               itemBuilder: (context, index) {
                 final plan = plans[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(plan.name, style: Theme.of(context).textTheme.titleMedium),
-                              const SizedBox(height: 4),
-                              Text('${plan.durationDays} days · ₹${plan.totalAmount}'),
-                            ],
-                          ),
-                        ),
-                        Chip(label: Text(plan.status), visualDensity: VisualDensity.compact),
-                      ],
-                    ),
+                return AppListCard(
+                  title: Text(plan.name),
+                  subtitle: Text(
+                    '${plan.durationDays} days · ₹${plan.totalAmount}',
+                  ),
+                  trailing: StatusBadge(
+                    label: plan.status,
+                    tone: plan.status == 'active'
+                        ? StatusTone.success
+                        : StatusTone.neutral,
                   ),
                 );
               },

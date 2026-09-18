@@ -21,6 +21,7 @@ class DashboardSummary {
       if (value is num) return value;
       return num.parse(value as String);
     }
+
     return DashboardSummary(
       totalMembers: asNum(json['total_members']).toInt(),
       activeMembers: asNum(json['active_members']).toInt(),
@@ -58,7 +59,9 @@ class DashboardData {
 
   factory DashboardData.fromJson(Map<String, dynamic> json) {
     return DashboardData(
-      summary: DashboardSummary.fromJson(json['summary'] as Map<String, dynamic>),
+      summary: DashboardSummary.fromJson(
+        json['summary'] as Map<String, dynamic>,
+      ),
     );
   }
 

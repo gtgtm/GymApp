@@ -59,7 +59,9 @@ class _CreateTrialSheetState extends ConsumerState<_CreateTrialSheet> {
     setState(() => _isSaving = true);
     try {
       final format = DateFormat('yyyy-MM-dd');
-      await ref.read(trialRepositoryProvider).create(
+      await ref
+          .read(trialRepositoryProvider)
+          .create(
             TrialInput(
               name: _nameController.text.trim(),
               mobile: _mobileController.text.trim(),
@@ -71,7 +73,8 @@ class _CreateTrialSheetState extends ConsumerState<_CreateTrialSheet> {
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -100,14 +103,16 @@ class _CreateTrialSheetState extends ConsumerState<_CreateTrialSheet> {
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _mobileController,
               keyboardType: TextInputType.phone,
               decoration: const InputDecoration(labelText: 'Mobile Number'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 12),
             InkWell(

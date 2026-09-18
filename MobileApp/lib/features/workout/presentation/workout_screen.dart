@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gymapp_member/core/widgets/async_value_view.dart';
+import 'package:gymapp_member/core/widgets/empty_state.dart';
 import 'package:gymapp_member/features/workout/domain/workout_models.dart';
 import 'package:gymapp_member/features/workout/presentation/workout_providers.dart';
 
@@ -21,19 +22,17 @@ class WorkoutScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(myWorkoutPlansProvider),
           builder: (context, plans) {
             if (plans.isEmpty) {
-              return ListView(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: Text('No workout plan assigned yet.')),
-                  ),
-                ],
+              return const EmptyState(
+                icon: Icons.fitness_center_outlined,
+                message: 'No workout plan assigned yet.',
               );
             }
 
             return ListView(
               padding: const EdgeInsets.all(16),
-              children: [for (final plan in plans) _WorkoutPlanCard(plan: plan)],
+              children: [
+                for (final plan in plans) _WorkoutPlanCard(plan: plan),
+              ],
             );
           },
         ),
@@ -59,7 +58,11 @@ class _WorkoutPlanCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(plan.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              plan.name,
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
             if (plan.trainerName != null)
               Padding(
                 padding: const EdgeInsets.only(top: 2),
@@ -69,7 +72,8 @@ class _WorkoutPlanCard extends StatelessWidget {
                 ),
               ),
             const SizedBox(height: 12),
-            for (final day in sortedDays) _DaySection(day: day, exercises: exercisesByDay[day]!),
+            for (final day in sortedDays)
+              _DaySection(day: day, exercises: exercisesByDay[day]!),
           ],
         ),
       ),
@@ -94,7 +98,8 @@ class _DaySection extends StatelessWidget {
         children: [
           Text(
             label != null ? 'Day $day — $label' : 'Day $day',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 6),
           for (final exercise in exercises)
@@ -102,7 +107,8 @@ class _DaySection extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -111,9 +117,15 @@ class _DaySection extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(exercise.exerciseName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        Text(
+                          exercise.exerciseName,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
                         if (exercise.muscleGroup != null)
-                          Text(exercise.muscleGroup!, style: Theme.of(context).textTheme.bodySmall),
+                          Text(
+                            exercise.muscleGroup!,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                       ],
                     ),
                   ),

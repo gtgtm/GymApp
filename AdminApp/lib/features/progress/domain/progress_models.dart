@@ -13,7 +13,8 @@ class BodyMeasurement {
   });
 
   factory BodyMeasurement.fromJson(Map<String, dynamic> json) {
-    double? asDouble(dynamic value) => value == null ? null : num.parse('$value').toDouble();
+    double? asDouble(dynamic value) =>
+        value == null ? null : num.parse('$value').toDouble();
     return BodyMeasurement(
       id: json['id'] as int,
       recordedDate: json['recorded_date'] as String,

@@ -1,4 +1,11 @@
-const enquiryStatuses = ['new', 'contacted', 'trial', 'follow_up', 'converted', 'lost'];
+const enquiryStatuses = [
+  'new',
+  'contacted',
+  'trial',
+  'follow_up',
+  'converted',
+  'lost',
+];
 
 class EnquiryRef {
   const EnquiryRef({required this.id, required this.name});
@@ -37,7 +44,9 @@ class Enquiry {
       notes: json['notes'] as String?,
       interestedPlan: json['interested_plan'] == null
           ? null
-          : EnquiryRef.fromJson(json['interested_plan'] as Map<String, dynamic>),
+          : EnquiryRef.fromJson(
+              json['interested_plan'] as Map<String, dynamic>,
+            ),
       assignedStaff: json['assigned_staff'] == null
           ? null
           : EnquiryRef.fromJson(json['assigned_staff'] as Map<String, dynamic>),
@@ -89,7 +98,11 @@ class EnquiryInput {
 }
 
 class ConversionStats {
-  const ConversionStats({required this.total, required this.converted, required this.conversionRate});
+  const ConversionStats({
+    required this.total,
+    required this.converted,
+    required this.conversionRate,
+  });
 
   factory ConversionStats.fromJson(Map<String, dynamic> json) {
     return ConversionStats(

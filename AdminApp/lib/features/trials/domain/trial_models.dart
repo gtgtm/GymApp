@@ -5,7 +5,10 @@ class TrialTrainerRef {
 
   factory TrialTrainerRef.fromJson(Map<String, dynamic> json) {
     final user = json['user'] as Map<String, dynamic>?;
-    return TrialTrainerRef(id: json['id'] as int, name: user?['name'] as String? ?? '');
+    return TrialTrainerRef(
+      id: json['id'] as int,
+      name: user?['name'] as String? ?? '',
+    );
   }
 
   final int id;

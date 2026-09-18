@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:gymapp_admin/core/api/repository_providers.dart';
+import 'package:gymapp_admin/core/widgets/app_list_card.dart';
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
+import 'package:gymapp_admin/core/widgets/empty_state.dart';
 import 'package:gymapp_admin/features/trials/domain/trial_models.dart';
 import 'package:gymapp_admin/features/trials/presentation/create_trial_sheet.dart';
 import 'package:gymapp_admin/features/trials/presentation/trial_providers.dart';
@@ -34,7 +36,8 @@ class _TrialsScreenState extends ConsumerState<TrialsScreen> {
       ref.invalidate(trialListProvider);
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     }
   }
@@ -54,47 +57,33 @@ class _TrialsScreenState extends ConsumerState<TrialsScreen> {
         onRetry: () => ref.invalidate(trialListProvider),
         builder: (context, trials) {
           if (trials.isEmpty) {
-            return const Center(child: Text('No trials yet.'));
+            return const EmptyState(
+              icon: Icons.hourglass_empty,
+              message: 'No trials yet.',
+            );
           }
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(trialListProvider),
-            child: ListView.separated(
+            child: ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: trials.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final trial = trials[index];
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(trial.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                              Text(trial.mobile, style: Theme.of(context).textTheme.bodySmall),
-                              Text(
-                                '${dateFormat.format(DateTime.parse(trial.trialStart))} → ${dateFormat.format(DateTime.parse(trial.trialEnd))}',
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ],
-                          ),
-                        ),
-                        DropdownButton<String>(
-                          value: trial.status,
-                          underline: const SizedBox.shrink(),
-                          items: [
-                            for (final status in trialStatuses)
-                              DropdownMenuItem(value: status, child: Text(status)),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) _updateStatus(trial, value);
-                          },
-                        ),
-                      ],
-                    ),
+                return AppListCard(
+                  title: Text(trial.name),
+                  subtitle: Text(
+                    '${trial.mobile}\n${dateFormat.format(DateTime.parse(trial.trialStart))} → ${dateFormat.format(DateTime.parse(trial.trialEnd))}',
+                  ),
+                  trailing: DropdownButton<String>(
+                    value: trial.status,
+                    underline: const SizedBox.shrink(),
+                    items: [
+                      for (final status in trialStatuses)
+                        DropdownMenuItem(value: status, child: Text(status)),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) _updateStatus(trial, value);
+                    },
                   ),
                 );
               },

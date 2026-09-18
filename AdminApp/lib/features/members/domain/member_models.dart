@@ -14,7 +14,10 @@ class MemberTrainerRef {
   const MemberTrainerRef({required this.id, required this.name});
 
   factory MemberTrainerRef.fromJson(Map<String, dynamic> json) {
-    return MemberTrainerRef(id: json['id'] as int, name: json['name'] as String);
+    return MemberTrainerRef(
+      id: json['id'] as int,
+      name: json['name'] as String,
+    );
   }
 
   final int id;
@@ -91,7 +94,9 @@ class Member {
       expiryBucket: _parseExpiryBucket(json['expiry_bucket'] as String?),
       currentMembership: json['current_membership'] == null
           ? null
-          : CurrentMembership.fromJson(json['current_membership'] as Map<String, dynamic>),
+          : CurrentMembership.fromJson(
+              json['current_membership'] as Map<String, dynamic>,
+            ),
     );
   }
 
@@ -207,7 +212,8 @@ class MemberInput {
       if (trainerId != null) 'trainer_id': trainerId,
       if (heightCm != null) 'height_cm': heightCm,
       if (weightKg != null) 'weight_kg': weightKg,
-      if (bloodGroup != null && bloodGroup!.isNotEmpty) 'blood_group': bloodGroup,
+      if (bloodGroup != null && bloodGroup!.isNotEmpty)
+        'blood_group': bloodGroup,
       if (notes != null && notes!.isNotEmpty) 'notes': notes,
       if (status != null) 'status': status,
       if (password != null && password!.isNotEmpty) 'password': password,

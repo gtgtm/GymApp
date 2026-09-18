@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gymapp_member/core/widgets/async_value_view.dart';
+import 'package:gymapp_member/core/widgets/empty_state.dart';
 import 'package:gymapp_member/features/diet/domain/diet_models.dart';
 import 'package:gymapp_member/features/diet/presentation/diet_providers.dart';
 
@@ -21,13 +22,9 @@ class DietScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(myDietPlansProvider),
           builder: (context, plans) {
             if (plans.isEmpty) {
-              return ListView(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: Text('No diet plan assigned yet.')),
-                  ),
-                ],
+              return const EmptyState(
+                icon: Icons.restaurant_outlined,
+                message: 'No diet plan assigned yet.',
               );
             }
 
@@ -56,9 +53,16 @@ class _DietPlanCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(plan.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              plan.name,
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
             if (plan.trainerName != null)
-              Text('Assigned by ${plan.trainerName}', style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                'Assigned by ${plan.trainerName}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             const SizedBox(height: 12),
             _NutritionSummaryRow(summary: plan.dailySummary),
             const SizedBox(height: 12),
@@ -77,11 +81,17 @@ class _NutritionSummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget stat(String label, String value) {
+    Widget stat(String label, String value, {bool emphasize = false}) {
       return Expanded(
         child: Column(
           children: [
-            Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: emphasize ? Theme.of(context).colorScheme.primary : null,
+              ),
+            ),
             Text(label, style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
@@ -91,12 +101,13 @@ class _NutritionSummaryRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest
+            .withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          stat('kcal', summary.calories.toStringAsFixed(0)),
+          stat('kcal', summary.calories.toStringAsFixed(0), emphasize: true),
           stat('Protein', '${summary.proteinG.toStringAsFixed(0)}g'),
           stat('Carbs', '${summary.carbsG.toStringAsFixed(0)}g'),
           stat('Fat', '${summary.fatG.toStringAsFixed(0)}g'),
@@ -127,13 +138,17 @@ class _MealRow extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 Text(
-                  [meal.foodItem, if (meal.quantity != null) '(${meal.quantity})'].join(' '),
+                  [
+                    meal.foodItem,
+                    if (meal.quantity != null) '(${meal.quantity})',
+                  ].join(' '),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),
           ),
-          if (meal.calories != null) Text('${meal.calories!.toStringAsFixed(0)} kcal'),
+          if (meal.calories != null)
+            Text('${meal.calories!.toStringAsFixed(0)} kcal'),
         ],
       ),
     );

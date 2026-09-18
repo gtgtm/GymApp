@@ -34,7 +34,9 @@ class _ExerciseDraft {
       dayNumber: dayNumber,
       exerciseName: nameController.text.trim(),
       sets: int.tryParse(setsController.text),
-      reps: repsController.text.trim().isEmpty ? null : repsController.text.trim(),
+      reps: repsController.text.trim().isEmpty
+          ? null
+          : repsController.text.trim(),
     );
   }
 }
@@ -45,10 +47,12 @@ class _CreateWorkoutPlanSheet extends ConsumerStatefulWidget {
   final int memberId;
 
   @override
-  ConsumerState<_CreateWorkoutPlanSheet> createState() => _CreateWorkoutPlanSheetState();
+  ConsumerState<_CreateWorkoutPlanSheet> createState() =>
+      _CreateWorkoutPlanSheetState();
 }
 
-class _CreateWorkoutPlanSheetState extends ConsumerState<_CreateWorkoutPlanSheet> {
+class _CreateWorkoutPlanSheetState
+    extends ConsumerState<_CreateWorkoutPlanSheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _exercises = <_ExerciseDraft>[_ExerciseDraft()];
@@ -66,7 +70,10 @@ class _CreateWorkoutPlanSheetState extends ConsumerState<_CreateWorkoutPlanSheet
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    final exercises = _exercises.map((e) => e.toExercise()).whereType<WorkoutExercise>().toList();
+    final exercises = _exercises
+        .map((e) => e.toExercise())
+        .whereType<WorkoutExercise>()
+        .toList();
     if (exercises.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Add at least one exercise.')),
@@ -76,7 +83,9 @@ class _CreateWorkoutPlanSheetState extends ConsumerState<_CreateWorkoutPlanSheet
 
     setState(() => _isSaving = true);
     try {
-      await ref.read(workoutRepositoryProvider).create(
+      await ref
+          .read(workoutRepositoryProvider)
+          .create(
             WorkoutPlanInput(
               memberId: widget.memberId,
               name: _nameController.text.trim(),
@@ -87,7 +96,8 @@ class _CreateWorkoutPlanSheetState extends ConsumerState<_CreateWorkoutPlanSheet
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -101,41 +111,69 @@ class _CreateWorkoutPlanSheetState extends ConsumerState<_CreateWorkoutPlanSheet
       minChildSize: 0.5,
       maxChildSize: 0.95,
       expand: false,
-      builder: (context, scrollController) => Form(
-        key: _formKey,
-        child: ListView(
-          controller: scrollController,
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text('Create Workout Plan', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Plan Name'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
-            ),
-            const SizedBox(height: 16),
-            Text('Exercises', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            for (var i = 0; i < _exercises.length; i++) _ExerciseRow(draft: _exercises[i], onRemove: _exercises.length > 1 ? () => setState(() => _exercises.removeAt(i)) : null),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: () => setState(() => _exercises.add(_ExerciseDraft())),
-              icon: const Icon(Icons.add),
-              label: const Text('Add Exercise'),
-            ),
-            const SizedBox(height: 20),
-            FilledButton(
-              onPressed: _isSaving ? null : _submit,
-              child: _isSaving
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Save Plan'),
-            ),
-          ],
+      builder: (context, scrollController) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).bottomSheetTheme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.all(16),
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).bottomSheetTheme.dragHandleColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Text(
+                'Create Workout Plan',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Plan Name'),
+                validator: (value) =>
+                    (value == null || value.trim().isEmpty) ? 'Required' : null,
+              ),
+              const SizedBox(height: 16),
+              Text('Exercises', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              for (var i = 0; i < _exercises.length; i++)
+                _ExerciseRow(
+                  draft: _exercises[i],
+                  onRemove: _exercises.length > 1
+                      ? () => setState(() => _exercises.removeAt(i))
+                      : null,
+                ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () =>
+                    setState(() => _exercises.add(_ExerciseDraft())),
+                icon: const Icon(Icons.add),
+                label: const Text('Add Exercise'),
+              ),
+              const SizedBox(height: 20),
+              FilledButton(
+                onPressed: _isSaving ? null : _submit,
+                child: _isSaving
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Save Plan'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -167,7 +205,9 @@ class _ExerciseRowState extends State<_ExerciseRow> {
                 Expanded(
                   child: TextField(
                     controller: widget.draft.nameController,
-                    decoration: const InputDecoration(labelText: 'Exercise Name'),
+                    decoration: const InputDecoration(
+                      labelText: 'Exercise Name',
+                    ),
                   ),
                 ),
                 if (widget.onRemove != null)
@@ -188,7 +228,8 @@ class _ExerciseRowState extends State<_ExerciseRow> {
                       for (var day = 1; day <= 7; day++)
                         DropdownMenuItem(value: day, child: Text('Day $day')),
                     ],
-                    onChanged: (value) => setState(() => widget.draft.dayNumber = value ?? 1),
+                    onChanged: (value) =>
+                        setState(() => widget.draft.dayNumber = value ?? 1),
                   ),
                 ),
                 const SizedBox(width: 8),

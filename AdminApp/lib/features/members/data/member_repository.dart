@@ -11,7 +11,9 @@ class MemberRepository {
     return unwrap(
       () => _apiClient.dio.get(
         '/members',
-        queryParameters: {if (search != null && search.isNotEmpty) 'search': search},
+        queryParameters: {
+          if (search != null && search.isNotEmpty) 'search': search,
+        },
       ),
       (data) {
         final items = (data as List<dynamic>)

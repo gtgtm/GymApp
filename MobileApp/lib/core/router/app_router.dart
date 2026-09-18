@@ -43,13 +43,34 @@ GoRouter appRouter(Ref ref) {
       ShellRoute(
         builder: (context, state, child) => _MemberShell(child: child),
         routes: [
-          GoRoute(path: '/dashboard', builder: (context, state) => const DashboardScreen()),
-          GoRoute(path: '/workout', builder: (context, state) => const WorkoutScreen()),
-          GoRoute(path: '/diet', builder: (context, state) => const DietScreen()),
-          GoRoute(path: '/progress', builder: (context, state) => const ProgressScreen()),
-          GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
-          GoRoute(path: '/attendance', builder: (context, state) => const AttendanceScreen()),
-          GoRoute(path: '/notifications', builder: (context, state) => const NotificationsScreen()),
+          GoRoute(
+            path: '/dashboard',
+            builder: (context, state) => const DashboardScreen(),
+          ),
+          GoRoute(
+            path: '/workout',
+            builder: (context, state) => const WorkoutScreen(),
+          ),
+          GoRoute(
+            path: '/diet',
+            builder: (context, state) => const DietScreen(),
+          ),
+          GoRoute(
+            path: '/progress',
+            builder: (context, state) => const ProgressScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/attendance',
+            builder: (context, state) => const AttendanceScreen(),
+          ),
+          GoRoute(
+            path: '/notifications',
+            builder: (context, state) => const NotificationsScreen(),
+          ),
         ],
       ),
     ],
@@ -63,7 +84,12 @@ class _MemberShell extends StatelessWidget {
 
   static const _tabs = [
     ('/dashboard', Icons.home_outlined, Icons.home, 'Home'),
-    ('/workout', Icons.fitness_center_outlined, Icons.fitness_center, 'Workout'),
+    (
+      '/workout',
+      Icons.fitness_center_outlined,
+      Icons.fitness_center,
+      'Workout',
+    ),
     ('/diet', Icons.restaurant_outlined, Icons.restaurant, 'Diet'),
     ('/progress', Icons.show_chart_outlined, Icons.show_chart, 'Progress'),
     ('/profile', Icons.person_outline, Icons.person, 'Profile'),
@@ -78,7 +104,9 @@ class _MemberShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentIndex = _currentIndex(context);
-    final isTabRoute = _tabs.any((tab) => tab.$1 == GoRouterState.of(context).matchedLocation);
+    final isTabRoute = _tabs.any(
+      (tab) => tab.$1 == GoRouterState.of(context).matchedLocation,
+    );
 
     return Scaffold(
       body: child,

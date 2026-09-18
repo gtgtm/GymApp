@@ -17,7 +17,8 @@ class GymBrainStaff extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'GymBrain Staff',
-      theme: AppTheme.light(),
+      theme: AppTheme.dark(),
+      themeMode: ThemeMode.dark,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );

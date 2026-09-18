@@ -7,10 +7,18 @@ class ReportRepository {
 
   final ApiClient _apiClient;
 
-  Future<FinancialSummary> financial({required String from, required String to}) {
+  Future<FinancialSummary> financial({
+    required String from,
+    required String to,
+  }) {
     return unwrap(
-      () => _apiClient.dio.get('/reports/financial', queryParameters: {'from': from, 'to': to}),
-      (data) => FinancialSummary.fromJson((data as Map<String, dynamic>)['summary'] as Map<String, dynamic>),
+      () => _apiClient.dio.get(
+        '/reports/financial',
+        queryParameters: {'from': from, 'to': to},
+      ),
+      (data) => FinancialSummary.fromJson(
+        (data as Map<String, dynamic>)['summary'] as Map<String, dynamic>,
+      ),
     );
   }
 }

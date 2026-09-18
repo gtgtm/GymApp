@@ -14,10 +14,18 @@ class DietMeal {
       mealSlot: json['meal_slot'] as String,
       foodItem: json['food_item'] as String,
       quantity: json['quantity'] as String?,
-      calories: json['calories'] != null ? double.tryParse(json['calories'].toString()) : null,
-      proteinG: json['protein_g'] != null ? double.tryParse(json['protein_g'].toString()) : null,
-      carbsG: json['carbs_g'] != null ? double.tryParse(json['carbs_g'].toString()) : null,
-      fatG: json['fat_g'] != null ? double.tryParse(json['fat_g'].toString()) : null,
+      calories: json['calories'] != null
+          ? double.tryParse(json['calories'].toString())
+          : null,
+      proteinG: json['protein_g'] != null
+          ? double.tryParse(json['protein_g'].toString())
+          : null,
+      carbsG: json['carbs_g'] != null
+          ? double.tryParse(json['carbs_g'].toString())
+          : null,
+      fatG: json['fat_g'] != null
+          ? double.tryParse(json['fat_g'].toString())
+          : null,
     );
   }
 
@@ -77,11 +85,15 @@ class DietPlan {
       id: json['id'] as int,
       name: json['name'] as String,
       status: json['status'] as String,
-      trainerName: (json['trainer'] as Map<String, dynamic>?)?['user']?['name'] as String?,
+      trainerName:
+          (json['trainer'] as Map<String, dynamic>?)?['user']?['name']
+              as String?,
       meals: (json['meals'] as List<dynamic>? ?? [])
           .map((item) => DietMeal.fromJson(item as Map<String, dynamic>))
           .toList(),
-      dailySummary: DailyNutritionSummary.fromJson(json['daily_summary'] as Map<String, dynamic>),
+      dailySummary: DailyNutritionSummary.fromJson(
+        json['daily_summary'] as Map<String, dynamic>,
+      ),
     );
   }
 

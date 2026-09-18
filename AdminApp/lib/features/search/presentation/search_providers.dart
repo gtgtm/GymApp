@@ -15,7 +15,12 @@ SearchRepository searchRepository(Ref ref) {
 Future<GlobalSearchResults> globalSearch(Ref ref, String query) {
   if (query.trim().length < 2) {
     return Future.value(
-      const GlobalSearchResults(members: [], trainers: [], payments: [], enquiries: []),
+      const GlobalSearchResults(
+        members: [],
+        trainers: [],
+        payments: [],
+        enquiries: [],
+      ),
     );
   }
   return ref.watch(searchRepositoryProvider).search(query);

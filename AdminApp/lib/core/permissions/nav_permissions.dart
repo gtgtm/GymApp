@@ -13,20 +13,26 @@ enum NavKey {
   reports,
 }
 
+const _adminNavKeys = [
+  NavKey.dashboard,
+  NavKey.members,
+  NavKey.trainers,
+  NavKey.plans,
+  NavKey.payments,
+  NavKey.attendance,
+  NavKey.enquiries,
+  NavKey.trials,
+  NavKey.expenses,
+  NavKey.equipment,
+  NavKey.reports,
+];
+
 const _roleNavAccess = <String, List<NavKey>>{
-  'admin': [
-    NavKey.dashboard,
-    NavKey.members,
-    NavKey.trainers,
-    NavKey.plans,
-    NavKey.payments,
-    NavKey.attendance,
-    NavKey.enquiries,
-    NavKey.trials,
-    NavKey.expenses,
-    NavKey.equipment,
-    NavKey.reports,
-  ],
+  // super_admin only sees gym-admin nav once it has entered a gym (see
+  // ActingGymHub); the platform (gym directory) screen sits outside this
+  // nav entirely, reached via its own shell.
+  'super_admin': _adminNavKeys,
+  'admin': _adminNavKeys,
   'receptionist': [
     NavKey.dashboard,
     NavKey.members,
@@ -44,4 +50,4 @@ bool canAccessNav(String? roleName, NavKey key) {
 }
 
 /// Roles this app accepts at login. Member accounts must use the member app.
-const staffRoleNames = ['admin', 'receptionist', 'trainer'];
+const staffRoleNames = ['super_admin', 'admin', 'receptionist', 'trainer'];

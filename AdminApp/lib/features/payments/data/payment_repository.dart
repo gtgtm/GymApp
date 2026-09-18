@@ -10,8 +10,9 @@ class PaymentRepository {
   Future<List<Payment>> list() {
     return unwrap(
       () => _apiClient.dio.get('/payments'),
-      (data) =>
-          (data as List<dynamic>).map((json) => Payment.fromJson(json as Map<String, dynamic>)).toList(),
+      (data) => (data as List<dynamic>)
+          .map((json) => Payment.fromJson(json as Map<String, dynamic>))
+          .toList(),
     );
   }
 

@@ -40,7 +40,9 @@ class _CreatePlanSheetState extends ConsumerState<_CreatePlanSheet> {
 
     setState(() => _isSaving = true);
     try {
-      await ref.read(planRepositoryProvider).create(
+      await ref
+          .read(planRepositoryProvider)
+          .create(
             PlanInput(
               name: _nameController.text.trim(),
               durationDays: int.parse(_durationController.text),
@@ -51,7 +53,8 @@ class _CreatePlanSheetState extends ConsumerState<_CreatePlanSheet> {
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -78,7 +81,8 @@ class _CreatePlanSheetState extends ConsumerState<_CreatePlanSheet> {
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Plan Name'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -94,11 +98,14 @@ class _CreatePlanSheetState extends ConsumerState<_CreatePlanSheet> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _priceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: const InputDecoration(labelText: 'Price'),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) return 'Required';
-                if (double.tryParse(value) == null) return 'Enter a valid amount';
+                if (double.tryParse(value) == null)
+                  return 'Enter a valid amount';
                 return null;
               },
             ),

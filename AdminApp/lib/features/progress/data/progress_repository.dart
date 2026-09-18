@@ -11,7 +11,10 @@ class ProgressRepository {
 
   Future<List<BodyMeasurement>> measurements(int memberId) {
     return unwrap(
-      () => _apiClient.dio.get('/body-measurements', queryParameters: {'member_id': memberId}),
+      () => _apiClient.dio.get(
+        '/body-measurements',
+        queryParameters: {'member_id': memberId},
+      ),
       (data) => (data as List<dynamic>)
           .map((json) => BodyMeasurement.fromJson(json as Map<String, dynamic>))
           .toList(),
@@ -27,7 +30,10 @@ class ProgressRepository {
 
   Future<List<ProgressPhoto>> photos(int memberId) {
     return unwrap(
-      () => _apiClient.dio.get('/progress-photos', queryParameters: {'member_id': memberId}),
+      () => _apiClient.dio.get(
+        '/progress-photos',
+        queryParameters: {'member_id': memberId},
+      ),
       (data) => (data as List<dynamic>)
           .map((json) => ProgressPhoto.fromJson(json as Map<String, dynamic>))
           .toList(),
@@ -54,6 +60,9 @@ class ProgressRepository {
   }
 
   Future<void> deletePhoto(int id) {
-    return unwrap(() => _apiClient.dio.delete('/progress-photos/$id'), (_) => null);
+    return unwrap(
+      () => _apiClient.dio.delete('/progress-photos/$id'),
+      (_) => null,
+    );
   }
 }

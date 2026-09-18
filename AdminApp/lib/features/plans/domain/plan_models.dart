@@ -66,7 +66,8 @@ class PlanInput {
       if (registrationFee != null) 'registration_fee': registrationFee,
       if (discount != null) 'discount': discount,
       if (tax != null) 'tax': tax,
-      if (description != null && description!.isNotEmpty) 'description': description,
+      if (description != null && description!.isNotEmpty)
+        'description': description,
     };
   }
 }

@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gymapp_admin/core/api/repository_providers.dart';
+import 'package:gymapp_admin/core/widgets/app_list_card.dart';
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
+import 'package:gymapp_admin/core/widgets/empty_state.dart';
+import 'package:gymapp_admin/core/widgets/section_header.dart';
+import 'package:gymapp_admin/core/widgets/status_badge.dart';
 import 'package:gymapp_admin/features/attendance/domain/mark_attendance_exception.dart';
 import 'package:gymapp_admin/features/attendance/presentation/attendance_providers.dart';
 import 'package:gymapp_admin/features/attendance/presentation/qr_scanner_view.dart';
@@ -46,7 +50,9 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
 
   Future<void> _markByMember(Member member) async {
     try {
-      final result = await ref.read(attendanceRepositoryProvider).markByMemberId(member.id);
+      final result = await ref
+          .read(attendanceRepositoryProvider)
+          .markByMemberId(member.id);
       _showResult(
         '${member.fullName} marked present. Valid until ${result.membershipEndDate ?? '-'}.',
       );
@@ -60,7 +66,9 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
 
   Future<void> _handleQrDetected(String qrToken) async {
     try {
-      final result = await ref.read(attendanceRepositoryProvider).scanQr(qrToken);
+      final result = await ref
+          .read(attendanceRepositoryProvider)
+          .scanQr(qrToken);
       _showResult(
         '${result.member?.fullName ?? 'Member'} checked in. Valid until ${result.membershipEndDate ?? '-'}.',
       );
@@ -94,7 +102,10 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    QrScannerView(onDetected: (value) => unawaited(_handleQrDetected(value))),
+                    QrScannerView(
+                      onDetected: (value) =>
+                          unawaited(_handleQrDetected(value)),
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       'Point the camera at a member\'s QR code.',
@@ -108,11 +119,8 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
         ),
         const Divider(height: 1),
         Padding(
-          padding: const EdgeInsets.all(16),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text("Today's Attendance", style: Theme.of(context).textTheme.titleMedium),
-          ),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: SectionHeader(title: "Today's Attendance"),
         ),
         Expanded(
           child: AsyncValueView(
@@ -120,16 +128,25 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
             onRetry: () => ref.invalidate(todaysAttendanceProvider),
             builder: (context, entries) {
               if (entries.isEmpty) {
-                return const Center(child: Text('No attendance marked yet today.'));
+                return const EmptyState(
+                  icon: Icons.event_available_outlined,
+                  message: 'No attendance marked yet today.',
+                );
               }
               return ListView.builder(
+                padding: const EdgeInsets.all(16),
                 itemCount: entries.length,
                 itemBuilder: (context, index) {
                   final entry = entries[index];
-                  return ListTile(
+                  return AppListCard(
                     title: Text(entry.member?.fullName ?? 'Unknown member'),
                     subtitle: Text(entry.checkInTime ?? ''),
-                    trailing: Chip(label: Text(entry.status)),
+                    trailing: StatusBadge(
+                      label: entry.status,
+                      tone: entry.status == 'present'
+                          ? StatusTone.success
+                          : StatusTone.neutral,
+                    ),
                   );
                 },
               );
@@ -183,38 +200,34 @@ class _SearchMarkTabState extends ConsumerState<_SearchMarkTab> {
               value: membersAsync,
               builder: (context, page) {
                 if (_search.trim().length < 2) {
-                  return const Center(child: Text('Type at least 2 characters to search.'));
+                  return const EmptyState(
+                    icon: Icons.search,
+                    message: 'Type at least 2 characters to search.',
+                  );
                 }
                 if (page.members.isEmpty) {
-                  return const Center(child: Text('No members found.'));
+                  return const EmptyState(
+                    icon: Icons.people_outline,
+                    message: 'No members found.',
+                  );
                 }
                 return ListView.builder(
                   itemCount: page.members.length,
                   itemBuilder: (context, index) {
                     final member = page.members[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(member.fullName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                Text(
-                                  '${member.mobile} · ${member.memberCode}',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
+                    return AppListCard(
+                      title: Text(member.fullName),
+                      subtitle: Text('${member.mobile} · ${member.memberCode}'),
+                      trailing: FilledButton(
+                        style: FilledButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
                           ),
-                          const SizedBox(width: 8),
-                          FilledButton(
-                            style: FilledButton.styleFrom(minimumSize: Size.zero),
-                            onPressed: () => widget.onMark(member),
-                            child: const Text('Mark'),
-                          ),
-                        ],
+                        ),
+                        onPressed: () => widget.onMark(member),
+                        child: const Text('Mark'),
                       ),
                     );
                   },

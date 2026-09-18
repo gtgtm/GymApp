@@ -12,6 +12,9 @@ class EnsureUserHasRole
 {
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
+        // User::hasRole() already treats a super_admin acting as a gym (see
+        // ResolveActingGym) as that gym's admin, so no special-casing needed
+        // here.
         if (! $request->user()?->hasRole(...$roles)) {
             return response()->json([
                 'success' => false,

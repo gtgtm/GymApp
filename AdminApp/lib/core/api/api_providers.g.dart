@@ -50,6 +50,47 @@ final class TokenStorageProvider
 
 String _$tokenStorageHash() => r'a42816fb1cf5af728e44ff5c48bfcaf5dc6b12aa';
 
+@ProviderFor(actingGymHub)
+final actingGymHubProvider = ActingGymHubProvider._();
+
+final class ActingGymHubProvider
+    extends $FunctionalProvider<ActingGymHub, ActingGymHub, ActingGymHub>
+    with $Provider<ActingGymHub> {
+  ActingGymHubProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'actingGymHubProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$actingGymHubHash();
+
+  @$internal
+  @override
+  $ProviderElement<ActingGymHub> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ActingGymHub create(Ref ref) {
+    return actingGymHub(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ActingGymHub value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ActingGymHub>(value),
+    );
+  }
+}
+
+String _$actingGymHubHash() => r'edd2366b6760d0a71a971ab60085cea24b8e1a1d';
+
 @ProviderFor(unauthorizedHub)
 final unauthorizedHubProvider = UnauthorizedHubProvider._();
 
@@ -136,4 +177,4 @@ final class ApiClientProvider
   }
 }
 
-String _$apiClientHash() => r'1767150d36474b43bd715cb384613a2cc65119ee';
+String _$apiClientHash() => r'b94ac6eb262c1b4babdaeef180176d58a1a09687';

@@ -24,6 +24,9 @@ class PlanRepository {
   }
 
   Future<void> delete(int id) {
-    return unwrap(() => _apiClient.dio.delete('/membership-plans/$id'), (_) => null);
+    return unwrap(
+      () => _apiClient.dio.delete('/membership-plans/$id'),
+      (_) => null,
+    );
   }
 }

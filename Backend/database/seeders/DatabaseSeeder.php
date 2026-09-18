@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             RolesSeeder::class,
             DemoGymSeeder::class,
             SuperAdminSeeder::class,
+            TenRecordsSeeder::class,
         ]);
     }
 }

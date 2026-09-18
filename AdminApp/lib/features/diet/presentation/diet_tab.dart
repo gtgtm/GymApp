@@ -44,14 +44,25 @@ class DietTab extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(plan.name, style: Theme.of(context).textTheme.titleMedium),
-                            Chip(label: Text(plan.status), visualDensity: VisualDensity.compact),
+                            Text(
+                              plan.name,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Chip(
+                              label: Text(plan.status),
+                              visualDensity: VisualDensity.compact,
+                            ),
                           ],
                         ),
                         const Divider(height: 20),
                         for (final slot in mealSlots)
                           if (bySlot[slot] != null) ...[
-                            Text(mealSlotLabel(slot), style: const TextStyle(fontWeight: FontWeight.w600)),
+                            Text(
+                              mealSlotLabel(slot),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             for (final meal in bySlot[slot]!)
                               Padding(
                                 padding: const EdgeInsets.only(left: 8, top: 2),
