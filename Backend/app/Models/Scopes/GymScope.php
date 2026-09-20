@@ -13,11 +13,12 @@ class GymScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $gymId = auth()->user()?->gym_id
-            // super_admin has no gym_id of its own; ResolveActingGym middleware
-            // populates this from the X-Gym-Id header once it has verified the
-            // caller is super_admin, so this is never attacker-controlled input.
-            ?? app(ActingGymContext::class)->gymId();
+        // ActingGymContext is resolved fresh per request by
+        // ResolveActingGym — for every role, not just super_admin — after
+        // validating an active UserGymMembership (or auto-selecting the
+        // caller's sole one). This is never attacker-controlled input:
+        // the middleware is the only thing that ever populates it.
+        $gymId = app(ActingGymContext::class)->gymId();
 
         if ($gymId) {
             $builder->where($model->getTable().'.gym_id', $gymId);

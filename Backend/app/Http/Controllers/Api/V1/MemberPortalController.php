@@ -23,7 +23,7 @@ class MemberPortalController extends Controller
 
     private function currentMember(Request $request): Member
     {
-        $member = $request->user()->memberProfile;
+        $member = $request->user()->currentMemberProfile();
 
         abort_unless($member, 404, 'No member profile is linked to this account.');
 
@@ -117,10 +117,7 @@ class MemberPortalController extends Controller
     {
         $member = $this->currentMember($request);
 
-        $staff = User::query()
-            ->where('gym_id', $member->gym_id)
-            ->whereHas('role', fn ($query) => $query->whereIn('name', [Role::ADMIN, Role::RECEPTIONIST]))
-            ->get();
+        $staff = User::staffAtGymWithRole($member->gym_id, [Role::ADMIN, Role::RECEPTIONIST]);
 
         $message = new NotificationMessage(
             type: GymNotification::TYPE_RENEWAL_REQUESTED,
@@ -130,7 +127,7 @@ class MemberPortalController extends Controller
         );
 
         foreach ($staff as $staffMember) {
-            $this->notificationService->notify($staffMember, $message);
+            $this->notificationService->notify($staffMember, $message, gymId: $member->gym_id);
         }
 
         return $this->success(['message' => 'Renewal request sent. Gym staff will contact you shortly.']);

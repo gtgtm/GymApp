@@ -50,10 +50,7 @@ class EnquiryController extends Controller
 
         $this->auditLog->log('enquiry.created', $enquiry, null, $enquiry->toArray());
 
-        $admins = User::query()
-            ->where('gym_id', $enquiry->gym_id)
-            ->whereHas('role', fn ($query) => $query->where('name', Role::ADMIN))
-            ->get();
+        $admins = User::staffAtGymWithRole($enquiry->gym_id, [Role::ADMIN]);
 
         foreach ($admins as $admin) {
             $this->notificationService->notify(
@@ -64,6 +61,7 @@ class EnquiryController extends Controller
                     body: "{$enquiry->mobile}".($enquiry->source ? " via {$enquiry->source}" : ''),
                     data: ['enquiry_id' => $enquiry->id],
                 ),
+                gymId: $enquiry->gym_id,
             );
         }
 

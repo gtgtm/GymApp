@@ -14,7 +14,7 @@ class AuditLogService
         $user = auth()->user();
 
         return AuditLog::query()->create([
-            'gym_id' => $gymId ?? $user?->gym_id,
+            'gym_id' => $gymId ?? app(ActingGymContext::class)->gymId(),
             'user_id' => $user?->id,
             'action' => $action,
             'entity_type' => $entity ? $entity::class : 'auth',

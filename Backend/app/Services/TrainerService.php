@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Role;
 use App\Models\Trainer;
 use App\Models\User;
+use App\Models\UserGymMembership;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,11 +16,14 @@ class TrainerService
     public function create(array $data): Trainer
     {
         return DB::transaction(function () use ($data) {
-            $gymId = auth()->user()->gym_id;
+            $gymId = app(ActingGymContext::class)->gymId();
             $trainerRoleId = Role::query()->where('name', Role::TRAINER)->value('id');
 
+            if (User::query()->where('email', $data['email'])->exists()) {
+                throw new \DomainException('A user with this email already exists on the platform.');
+            }
+
             $user = User::query()->create([
-                'gym_id' => $gymId,
                 'role_id' => $trainerRoleId,
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -28,7 +32,7 @@ class TrainerService
                 'status' => 'active',
             ]);
 
-            return Trainer::query()->create([
+            $trainer = Trainer::query()->create([
                 'gym_id' => $gymId,
                 'user_id' => $user->id,
                 'specialization' => $data['specialization'] ?? null,
@@ -36,6 +40,16 @@ class TrainerService
                 'salary' => $data['salary'] ?? null,
                 'status' => $data['status'] ?? 'active',
             ]);
+
+            UserGymMembership::query()->create([
+                'user_id' => $user->id,
+                'gym_id' => $gymId,
+                'role_id' => $trainerRoleId,
+                'status' => UserGymMembership::STATUS_ACTIVE,
+                'joined_at' => $trainer->joining_date ?? now(),
+            ]);
+
+            return $trainer;
         });
     }
 

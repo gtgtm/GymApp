@@ -32,10 +32,7 @@ class NotifyEquipmentMaintenance extends Command
                 return;
             }
 
-            $admins = User::query()
-                ->where('gym_id', $gym->id)
-                ->whereHas('role', fn ($query) => $query->where('name', Role::ADMIN))
-                ->get();
+            $admins = User::staffAtGymWithRole($gym->id, [Role::ADMIN]);
 
             $message = new NotificationMessage(
                 type: \App\Models\GymNotification::TYPE_EQUIPMENT_MAINTENANCE,
@@ -45,7 +42,7 @@ class NotifyEquipmentMaintenance extends Command
             );
 
             foreach ($admins as $admin) {
-                $notificationService->notify($admin, $message);
+                $notificationService->notify($admin, $message, gymId: $gym->id);
             }
         });
 

@@ -37,4 +37,20 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Thrown by services for expected, user-facing business-rule
+        // violations (e.g. GymMembershipService/TrainerService rejecting a
+        // duplicate email) — not a bug, so it renders as a normal API
+        // error instead of a 500.
+        $exceptions->render(function (\DomainException $exception, Request $request) {
+            if (! $request->is('api/*') && ! $request->expectsJson()) {
+                return null;
+            }
+
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'error' => ['message' => $exception->getMessage(), 'errors' => null],
+            ], 422);
+        });
     })->create();

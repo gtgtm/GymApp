@@ -7,6 +7,7 @@ namespace Tests\Concerns;
 use App\Models\Gym;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserGymMembership;
 use Illuminate\Support\Facades\Hash;
 
 trait CreatesGymUsers
@@ -29,7 +30,7 @@ trait CreatesGymUsers
     {
         $role = $this->createRole($roleName);
 
-        return User::query()->create([
+        $user = User::query()->create([
             'gym_id' => $gym->id,
             'role_id' => $role->id,
             'name' => $overrides['name'] ?? ucfirst($roleName).' User',
@@ -38,5 +39,20 @@ trait CreatesGymUsers
             'status' => 'active',
             ...$overrides,
         ]);
+
+        // super_admin has no gym-scoped membership; every other role needs
+        // one for ResolveActingGym to resolve tenancy (see AuthTest,
+        // ActingGymTest and friends, which rely on this fixture).
+        if ($roleName !== Role::SUPER_ADMIN) {
+            UserGymMembership::query()->create([
+                'user_id' => $user->id,
+                'gym_id' => $gym->id,
+                'role_id' => $role->id,
+                'status' => UserGymMembership::STATUS_ACTIVE,
+                'joined_at' => now(),
+            ]);
+        }
+
+        return $user;
     }
 }

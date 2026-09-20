@@ -75,6 +75,7 @@ class RenewalService
                         body: "New expiry: {$newExpiry->toDateString()}.",
                         data: ['member_id' => $member->id, 'renewal_id' => $renewal->id],
                     ),
+                    gymId: $member->gym_id,
                 );
             }
 

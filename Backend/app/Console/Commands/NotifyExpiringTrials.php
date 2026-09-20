@@ -32,10 +32,7 @@ class NotifyExpiringTrials extends Command
                 return;
             }
 
-            $staff = User::query()
-                ->where('gym_id', $gym->id)
-                ->whereHas('role', fn ($query) => $query->whereIn('name', [Role::ADMIN, Role::RECEPTIONIST]))
-                ->get();
+            $staff = User::staffAtGymWithRole($gym->id, [Role::ADMIN, Role::RECEPTIONIST]);
 
             $message = new NotificationMessage(
                 type: \App\Models\GymNotification::TYPE_TRIAL_EXPIRING,
@@ -45,7 +42,7 @@ class NotifyExpiringTrials extends Command
             );
 
             foreach ($staff as $member) {
-                $notificationService->notify($member, $message);
+                $notificationService->notify($member, $message, gymId: $gym->id);
             }
         });
 

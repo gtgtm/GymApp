@@ -3,6 +3,7 @@ import 'package:gymapp_admin/core/api/api_exception.dart';
 import 'package:gymapp_admin/core/api/api_response.dart';
 import 'package:gymapp_admin/core/auth/token_storage.dart';
 import 'package:gymapp_admin/core/permissions/nav_permissions.dart';
+import 'package:gymapp_admin/features/auth/domain/gym_membership.dart';
 import 'package:gymapp_admin/features/auth/domain/staff_user.dart';
 
 class AuthRepository {
@@ -30,9 +31,9 @@ class AuthRepository {
     final token = result['token'] as String;
     final user = StaffUser.fromJson(result['user'] as Map<String, dynamic>);
 
-    if (!staffRoleNames.contains(user.roleName)) {
+    if (!_hasStaffAccess(user)) {
       // Do not persist a token for an account this app doesn't support —
-      // member accounts belong in the member portal app instead.
+      // member-only accounts belong in the member portal app instead.
       throw const ApiException(
         'This app is for gym staff. Members should use the GymBrain member app.',
       );
@@ -60,7 +61,7 @@ class AuthRepository {
         (data) => StaffUser.fromJson(data as Map<String, dynamic>),
       );
 
-      if (!staffRoleNames.contains(user.roleName)) {
+      if (!_hasStaffAccess(user)) {
         await _tokenStorage.clear();
         return null;
       }
@@ -70,5 +71,60 @@ class AuthRepository {
       await _tokenStorage.clear();
       return null;
     }
+  }
+
+  /// The caller's ACTIVE memberships — the gyms they can act as right now.
+  Future<List<GymMembership>> myGyms() {
+    return unwrap(
+      () => _apiClient.dio.get('/my-gyms'),
+      (data) => (data as List<dynamic>)
+          .map((json) => GymMembership.fromJson(json as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  /// Memberships another gym added this person to by email, awaiting their
+  /// own confirmation (see GymMembershipService on the backend) before
+  /// that gym can act on their behalf.
+  Future<List<GymMembership>> pendingGyms() {
+    return unwrap(
+      () => _apiClient.dio.get('/my-gyms/pending'),
+      (data) => (data as List<dynamic>)
+          .map((json) => GymMembership.fromJson(json as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Future<GymMembership> acceptMembership(int membershipId) {
+    return unwrap(
+      () => _apiClient.dio.post('/memberships/$membershipId/accept'),
+      (data) => GymMembership.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  /// Records which gym to pre-select next login. Purely a UX convenience —
+  /// it does NOT scope this session; the caller must still enter the gym
+  /// via ActingGymController so ApiClient attaches X-Gym-Id on every
+  /// subsequent request.
+  Future<GymMembership> switchGym(int gymId) {
+    return unwrap(
+      () => _apiClient.dio.post('/switch-gym', data: {'gym_id': gymId}),
+      (data) => GymMembership.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  /// True when this login can use the staff app at all: either super_admin
+  /// (platform-level, no gym of its own), or it has at least one
+  /// membership in a staff role (see nav_permissions.dart's
+  /// staffRoleNames). A person who is ONLY a member everywhere they belong
+  /// must use the member portal app instead — but a membership-list is not
+  /// "one role" any more, so this checks each membership rather than a
+  /// single top-level roleName.
+  bool _hasStaffAccess(StaffUser user) {
+    if (user.isSuperAdmin) return true;
+
+    return user.memberships.any(
+      (membership) => staffRoleNames.contains(membership.roleName),
+    );
   }
 }

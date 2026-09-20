@@ -16,10 +16,8 @@ trait BelongsToGym
         static::addGlobalScope(new GymScope);
 
         static::creating(function ($model): void {
-            // Mirrors GymScope's gym resolution: super_admin has no gym_id
-            // of its own, so new rows it creates belong to the gym it is
-            // currently acting as (see ResolveActingGym middleware).
-            $gymId = auth()->user()?->gym_id ?? app(ActingGymContext::class)->gymId();
+            // Mirrors GymScope's gym resolution — see that class.
+            $gymId = app(ActingGymContext::class)->gymId();
 
             if (! $model->gym_id && $gymId) {
                 $model->gym_id = $gymId;

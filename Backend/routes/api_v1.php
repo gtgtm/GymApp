@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\PlatformController;
 use App\Http\Controllers\Api\V1\ProgressPhotoController;
 use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
+use App\Http\Controllers\Api\V1\SubscriptionPlanController;
 use App\Http\Controllers\Api\V1\TrainerController;
 use App\Http\Controllers\Api\V1\TrialController;
 use App\Http\Controllers\Api\V1\WorkoutPlanController;
@@ -27,8 +28,12 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
 Route::middleware(['auth:sanctum', 'acting_gym', 'bindings'])->group(function (): void {
-    Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('me', [AuthController::class, 'me']);
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('me', [AuthController::class, 'me'])->name('me');
+    Route::get('my-gyms', [AuthController::class, 'myGyms'])->name('my-gyms');
+    Route::get('my-gyms/pending', [AuthController::class, 'pendingGyms'])->name('my-gyms-pending');
+    Route::post('memberships/{membership}/accept', [AuthController::class, 'acceptGymMembership'])->name('membership-accept');
+    Route::post('switch-gym', [AuthController::class, 'switchGym'])->name('switch-gym');
 
     Route::get('dashboard', [DashboardController::class, 'index']);
 
@@ -41,9 +46,16 @@ Route::middleware(['auth:sanctum', 'acting_gym', 'bindings'])->group(function ()
     Route::middleware('role:super_admin')->group(function (): void {
         Route::get('subscriptions', [SubscriptionController::class, 'index']);
         Route::post('subscriptions', [SubscriptionController::class, 'store']);
+        Route::put('subscriptions/{subscription}', [SubscriptionController::class, 'update']);
 
         Route::get('platform/gyms', [PlatformController::class, 'gyms']);
+        Route::post('platform/gyms', [PlatformController::class, 'store']);
         Route::get('platform/gyms/{gym}', [PlatformController::class, 'gym']);
+        Route::put('platform/gyms/{gym}', [PlatformController::class, 'update']);
+
+        Route::apiResource('subscription-plans', SubscriptionPlanController::class)->only([
+            'index', 'store', 'update', 'destroy',
+        ]);
     });
 
     // Member-facing surface: a member sees only their own records, resolved

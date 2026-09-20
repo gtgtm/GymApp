@@ -15,6 +15,8 @@ export interface ApiFailure {
   error: {
     message: string;
     errors?: Record<string, string[]>;
+    code?: string;
+    memberships?: Array<{ gym_id: number; gym_name: string | null; role: string | null }>;
   };
 }
 
@@ -394,4 +396,31 @@ export interface Subscription {
   start_date: string;
   expiry_date: string;
   payment_status: "active" | "past_due" | "cancelled";
+}
+
+export interface PlatformGymSummary {
+  id: number;
+  name: string;
+  slug: string;
+  status: string;
+  members_count: number;
+  subscription: Subscription | null;
+}
+
+export interface PlatformGymDetail extends PlatformGymSummary {
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  active_members_count: number;
+}
+
+export interface SubscriptionPlanTier {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  member_limit: number | null;
+  price: string | null;
+  status: "active" | "inactive";
+  sort_order: number;
 }

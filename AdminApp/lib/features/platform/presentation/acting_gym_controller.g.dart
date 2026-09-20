@@ -51,7 +51,7 @@ final class ActingGymControllerProvider
 }
 
 String _$actingGymControllerHash() =>
-    r'abcf5e1d1878665f389ef77096f514c2807e5be1';
+    r'0f44705451af8bbc0f28774428d5a951f9291514';
 
 /// Riverpod-visible mirror of ActingGymHub so widgets can watch/rebuild on
 /// enter/exit. ApiClient reads the hub directly (it can't depend on
@@ -74,3 +74,64 @@ abstract class _$ActingGymController extends $Notifier<ActingGym?> {
     return element.handleCreate(ref, build);
   }
 }
+
+/// The role that applies to the gym currently being acted as — the answer
+/// to "what can this login do right now", which nav gating and dashboard
+/// variants both need. A super_admin acting as a gym is treated as that
+/// gym's admin (mirrors User::hasRole() on the backend); everyone else's
+/// role comes from whichever membership matches the acting gym, or their
+/// sole membership if none has been explicitly entered yet.
+
+@ProviderFor(actingRoleName)
+final actingRoleNameProvider = ActingRoleNameProvider._();
+
+/// The role that applies to the gym currently being acted as — the answer
+/// to "what can this login do right now", which nav gating and dashboard
+/// variants both need. A super_admin acting as a gym is treated as that
+/// gym's admin (mirrors User::hasRole() on the backend); everyone else's
+/// role comes from whichever membership matches the acting gym, or their
+/// sole membership if none has been explicitly entered yet.
+
+final class ActingRoleNameProvider
+    extends $FunctionalProvider<String?, String?, String?>
+    with $Provider<String?> {
+  /// The role that applies to the gym currently being acted as — the answer
+  /// to "what can this login do right now", which nav gating and dashboard
+  /// variants both need. A super_admin acting as a gym is treated as that
+  /// gym's admin (mirrors User::hasRole() on the backend); everyone else's
+  /// role comes from whichever membership matches the acting gym, or their
+  /// sole membership if none has been explicitly entered yet.
+  ActingRoleNameProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'actingRoleNameProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$actingRoleNameHash();
+
+  @$internal
+  @override
+  $ProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  String? create(Ref ref) {
+    return actingRoleName(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String?>(value),
+    );
+  }
+}
+
+String _$actingRoleNameHash() => r'e065fdd316a5124803d42414580602538881081a';

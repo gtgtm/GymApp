@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { LogOut, Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LogOut, Menu, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,8 +16,15 @@ const NotificationBell = dynamic(
 );
 
 export function Topbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, actingGym, exitGym } = useAuth();
+  const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const isSuperAdmin = user?.role.name === "super_admin";
+
+  function handleExitGym() {
+    exitGym();
+    router.push("/platform");
+  }
 
   const initials = user?.name
     ?.split(" ")
@@ -38,9 +46,22 @@ export function Topbar() {
           <Menu className="h-5 w-5" />
         </Button>
         <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
-        <p className="hidden truncate text-sm text-muted-foreground lg:block">
-          {user?.gym?.name ?? "All Gyms"}
-        </p>
+        {isSuperAdmin && actingGym ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="hidden shrink-0 gap-2 lg:flex"
+            onClick={handleExitGym}
+            title="Switch gym"
+          >
+            <Store className="h-3.5 w-3.5" />
+            <span className="max-w-40 truncate">{actingGym.name}</span>
+          </Button>
+        ) : (
+          <p className="hidden truncate text-sm text-muted-foreground lg:block">
+            {user?.gym?.name ?? "All Gyms"}
+          </p>
+        )}
         <div className="hidden min-w-0 flex-1 sm:block sm:max-w-xs md:max-w-sm">
           <GlobalSearchBar />
         </div>

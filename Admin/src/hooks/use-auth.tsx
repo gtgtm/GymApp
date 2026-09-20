@@ -10,7 +10,16 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { apiClient, clearStoredToken, getStoredToken, setStoredToken } from "@/lib/api-client";
+import {
+  apiClient,
+  clearStoredActingGym,
+  clearStoredToken,
+  getStoredActingGym,
+  getStoredToken,
+  setStoredActingGym,
+  setStoredToken,
+  type ActingGym,
+} from "@/lib/api-client";
 import type { ApiResponse, AuthUser } from "@/lib/api-types";
 
 interface AuthContextValue {
@@ -18,6 +27,9 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  actingGym: ActingGym | null;
+  enterGym: (gym: ActingGym) => void;
+  exitGym: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -25,6 +37,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [actingGym, setActingGym] = useState<ActingGym | null>(() => getStoredActingGym());
   const router = useRouter();
 
   const loadUser = useCallback(async () => {
@@ -54,6 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string) => {
+      clearStoredActingGym();
+      setActingGym(null);
+
       const { data } = await apiClient.post<ApiResponse<{ token: string; user: AuthUser }>>(
         "/login",
         { email, password },
@@ -65,7 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setStoredToken(data.data.token);
       setUser(data.data.user);
-      router.push("/dashboard");
+      // super_admin has no gym of its own — every gym-scoped screen requires
+      // having entered one first via the gym directory (see /gyms).
+      router.push(data.data.user.role.name === "super_admin" ? "/platform" : "/dashboard");
     },
     [router],
   );
@@ -75,13 +93,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiClient.post("/logout");
     } finally {
       clearStoredToken();
+      clearStoredActingGym();
       setUser(null);
+      setActingGym(null);
       router.push("/login");
     }
   }, [router]);
 
+  const enterGym = useCallback((gym: ActingGym) => {
+    setStoredActingGym(gym);
+    setActingGym(gym);
+  }, []);
+
+  const exitGym = useCallback(() => {
+    clearStoredActingGym();
+    setActingGym(null);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, login, logout, actingGym, enterGym, exitGym }}
+    >
       {children}
     </AuthContext.Provider>
   );

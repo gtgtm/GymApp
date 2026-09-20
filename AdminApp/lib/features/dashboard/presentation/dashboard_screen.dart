@@ -8,6 +8,7 @@ import 'package:gymapp_admin/features/auth/presentation/auth_controller.dart';
 import 'package:gymapp_admin/features/dashboard/domain/dashboard_models.dart';
 import 'package:gymapp_admin/features/dashboard/presentation/dashboard_providers.dart';
 import 'package:gymapp_admin/features/dashboard/presentation/quick_actions.dart';
+import 'package:gymapp_admin/features/platform/presentation/acting_gym_controller.dart';
 import 'package:gymapp_admin/features/subscriptions/presentation/subscription_status_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -15,7 +16,7 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authControllerProvider).value;
+    final actingRoleName = ref.watch(actingRoleNameProvider);
     final dashboardAsync = ref.watch(dashboardDataProvider);
 
     return RefreshIndicator(
@@ -26,7 +27,7 @@ class DashboardScreen extends ConsumerWidget {
         child: AsyncValueView(
           value: dashboardAsync,
           onRetry: () => ref.invalidate(dashboardDataProvider),
-          builder: (context, data) => switch (user?.roleName) {
+          builder: (context, data) => switch (actingRoleName) {
             'trainer' => _TrainerDashboard(summary: data.summary),
             'receptionist' => _ReceptionistDashboard(summary: data.summary),
             _ => _AdminDashboard(summary: data.summary),
@@ -221,6 +222,10 @@ class _TrainerDashboard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).value;
+    final actingGym = ref.watch(actingGymControllerProvider);
+    final roleLabel = user != null && actingGym != null
+        ? user.membershipFor(actingGym.id)?.roleLabel
+        : user?.soleMembership?.roleLabel;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,7 +236,7 @@ class _TrainerDashboard extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          user?.roleLabel ?? 'Trainer',
+          roleLabel ?? 'Trainer',
           style: Theme.of(context).textTheme.bodyMedium
               ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),

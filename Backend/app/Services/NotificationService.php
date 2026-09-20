@@ -20,13 +20,15 @@ class NotificationService
 
     /**
      * @param  string[]  $channels  Defaults to in-app only. Pass ['in_app', 'email'] to also email.
+     * @param  int|null  $gymId  Which gym this notification is about. Pass it whenever the
+     *                           caller has one (e.g. an entity's gym_id) — see InAppChannel.
      */
-    public function notify(User $user, NotificationMessage $message, array $channels = [GymNotification::CHANNEL_IN_APP]): void
+    public function notify(User $user, NotificationMessage $message, array $channels = [GymNotification::CHANNEL_IN_APP], ?int $gymId = null): void
     {
         foreach ($channels as $channel) {
             try {
                 match ($channel) {
-                    GymNotification::CHANNEL_IN_APP => $this->inAppChannel->send($user, $message),
+                    GymNotification::CHANNEL_IN_APP => $this->inAppChannel->send($user, $message, $gymId),
                     GymNotification::CHANNEL_EMAIL => $this->emailChannel->send($user, $message),
                     default => Log::warning("Unsupported notification channel requested: {$channel}"),
                 };

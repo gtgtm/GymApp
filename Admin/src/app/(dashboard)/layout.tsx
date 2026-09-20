@@ -9,9 +9,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { canAccessRoute } from "@/lib/permissions";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, actingGym } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const isSuperAdmin = user?.role.name === "super_admin";
+  const needsGymSelection = isSuperAdmin && !actingGym;
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -19,15 +21,23 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }
   }, [isLoading, user, router]);
 
+  // super_admin has no gym of its own — every gym-scoped screen requires
+  // having entered one first via the gym directory (see /gyms).
   useEffect(() => {
-    if (user && !canAccessRoute(user.role.name, pathname)) {
+    if (needsGymSelection) {
+      router.replace("/platform");
+    }
+  }, [needsGymSelection, router]);
+
+  useEffect(() => {
+    if (user && !needsGymSelection && !canAccessRoute(user.role.name, pathname)) {
       router.replace("/dashboard");
     }
-  }, [user, pathname, router]);
+  }, [user, needsGymSelection, pathname, router]);
 
   const isAuthorizedForRoute = user ? canAccessRoute(user.role.name, pathname) : false;
 
-  if (isLoading || !user || !isAuthorizedForRoute) {
+  if (isLoading || !user || needsGymSelection || !isAuthorizedForRoute) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Skeleton className="h-8 w-48" />

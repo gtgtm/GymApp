@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Gym;
+use App\Services\ActingGymContext;
 use App\Services\Reports\AttendanceReportService;
 use App\Services\Reports\CsvExporter;
 use App\Services\Reports\FinancialReportService;
@@ -54,7 +56,7 @@ class ReportController extends Controller
         $summary = $this->financialReports->summary($from, $to);
 
         return Pdf::loadView('reports.financial', [
-            'gym' => $request->user()->gym,
+            'gym' => Gym::query()->find(app(ActingGymContext::class)->gymId()),
             'summary' => $summary,
         ])->download('financial-report.pdf');
     }

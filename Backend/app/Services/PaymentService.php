@@ -32,6 +32,7 @@ class PaymentService
                     body: sprintf('Receipt %s for ₹%s.', $payment->receipt_number, $payment->amount),
                     data: ['payment_id' => $payment->id],
                 ),
+                gymId: $payment->gym_id,
             );
         }
 

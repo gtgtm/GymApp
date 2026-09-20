@@ -16,7 +16,6 @@ class SuperAdminSeeder extends Seeder
         User::query()->updateOrCreate(
             ['email' => 'superadmin@gymapp.test'],
             [
-                'gym_id' => null,
                 'role_id' => $superAdminRoleId,
                 'name' => 'Platform Owner',
                 'password' => Hash::make('password'),

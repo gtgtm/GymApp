@@ -16,6 +16,7 @@ use App\Models\Subscription;
 use App\Models\Trainer;
 use App\Models\Trial;
 use App\Models\User;
+use App\Models\UserGymMembership;
 use App\Models\WorkoutPlan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -51,7 +52,6 @@ class DemoGymSeeder extends Seeder
         $admin = User::query()->updateOrCreate(
             ['email' => 'admin@demofitness.test'],
             [
-                'gym_id' => $gym->id,
                 'role_id' => $roles[Role::ADMIN],
                 'name' => 'Aarav Sharma',
                 'phone' => '9999900001',
@@ -63,7 +63,6 @@ class DemoGymSeeder extends Seeder
         $receptionist = User::query()->updateOrCreate(
             ['email' => 'reception@demofitness.test'],
             [
-                'gym_id' => $gym->id,
                 'role_id' => $roles[Role::RECEPTIONIST],
                 'name' => 'Priya Nair',
                 'phone' => '9999900002',
@@ -75,7 +74,6 @@ class DemoGymSeeder extends Seeder
         $trainer = User::query()->updateOrCreate(
             ['email' => 'trainer@demofitness.test'],
             [
-                'gym_id' => $gym->id,
                 'role_id' => $roles[Role::TRAINER],
                 'name' => 'Rohan Verma',
                 'phone' => '9999900003',
@@ -83,6 +81,13 @@ class DemoGymSeeder extends Seeder
                 'status' => 'active',
             ],
         );
+
+        foreach ([$admin, $receptionist, $trainer] as $staffUser) {
+            UserGymMembership::query()->updateOrCreate(
+                ['user_id' => $staffUser->id, 'gym_id' => $gym->id],
+                ['role_id' => $staffUser->role_id, 'status' => UserGymMembership::STATUS_ACTIVE, 'joined_at' => now()],
+            );
+        }
 
         auth()->login($admin);
 
@@ -165,7 +170,6 @@ class DemoGymSeeder extends Seeder
                 $memberUser = User::query()->updateOrCreate(
                     ['email' => 'member@demofitness.test'],
                     [
-                        'gym_id' => $gym->id,
                         'role_id' => $memberRoleId,
                         'name' => $data['name'],
                         'phone' => $data['mobile'],
@@ -200,6 +204,18 @@ class DemoGymSeeder extends Seeder
                     'status' => 'active',
                 ],
             );
+
+            if ($memberUser) {
+                UserGymMembership::query()->updateOrCreate(
+                    ['user_id' => $memberUser->id, 'gym_id' => $gym->id],
+                    [
+                        'role_id' => $memberRoleId,
+                        'member_id' => $member->id,
+                        'status' => UserGymMembership::STATUS_ACTIVE,
+                        'joined_at' => $member->joining_date,
+                    ],
+                );
+            }
 
             $firstMember ??= $member;
         }

@@ -24,6 +24,7 @@ use App\Models\Subscription;
 use App\Models\Trainer;
 use App\Models\Trial;
 use App\Models\User;
+use App\Models\UserGymMembership;
 use App\Models\WorkoutExercise;
 use App\Models\WorkoutPlan;
 use Illuminate\Database\Seeder;
@@ -38,9 +39,9 @@ class TenRecordsSeeder extends Seeder
         $today = Carbon::today();
         $roles = Role::query()->pluck('id', 'name');
 
-        $admin = User::query()->where('gym_id', $gym->id)->where('role_id', $roles[Role::ADMIN])->firstOrFail();
-        $receptionist = User::query()->where('gym_id', $gym->id)->where('role_id', $roles[Role::RECEPTIONIST])->firstOrFail();
-        $trainerUser = User::query()->where('gym_id', $gym->id)->where('role_id', $roles[Role::TRAINER])->firstOrFail();
+        $admin = User::staffAtGymWithRole($gym->id, [Role::ADMIN])->firstOrFail();
+        $receptionist = User::staffAtGymWithRole($gym->id, [Role::RECEPTIONIST])->firstOrFail();
+        $trainerUser = User::staffAtGymWithRole($gym->id, [Role::TRAINER])->first();
         $trainerProfile = Trainer::query()->where('user_id', $trainerUser->id)->firstOrFail();
 
         // --- Top up other gyms to 10 (isolated tenants, no cross-links to demo data) ---
@@ -98,7 +99,7 @@ class TenRecordsSeeder extends Seeder
         $planCycle = [$monthlyPlan, $quarterlyPlan, $yearlyPlan];
 
         // --- Top up trainer users + profiles to 10 ---
-        $existingTrainerUsers = User::query()->where('gym_id', $gym->id)->where('role_id', $roles[Role::TRAINER])->count();
+        $existingTrainerUsers = User::staffAtGymWithRole($gym->id, [Role::TRAINER])->count();
         $trainerNamePool = [
             'Rohan Verma', 'Kabir Malhotra', 'Simran Kaur', 'Tarun Gill', 'Aisha Fernandes',
             'Yash Oberoi', 'Ritu Chawla', 'Devansh Kohli', 'Naina Bakshi', 'Omkar Patil',
@@ -109,7 +110,6 @@ class TenRecordsSeeder extends Seeder
             $trainerUserExtra = User::query()->updateOrCreate(
                 ['email' => 'trainer'.($i + 1).'@demofitness.test'],
                 [
-                    'gym_id' => $gym->id,
                     'role_id' => $roles[Role::TRAINER],
                     'name' => $trainerNamePool[$i] ?? ('Trainer '.($i + 1)),
                     'phone' => '9999901'.str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT),
@@ -127,6 +127,11 @@ class TenRecordsSeeder extends Seeder
                     'salary' => 30000 + ($i * 1000),
                     'status' => 'active',
                 ],
+            );
+
+            UserGymMembership::query()->updateOrCreate(
+                ['user_id' => $trainerUserExtra->id, 'gym_id' => $gym->id],
+                ['role_id' => $roles[Role::TRAINER], 'status' => UserGymMembership::STATUS_ACTIVE, 'joined_at' => $today->copy()->subMonths($i + 1)],
             );
         }
 

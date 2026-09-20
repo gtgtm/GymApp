@@ -15,9 +15,8 @@ class EnforceMemberLimit
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Mirrors GymScope's gym resolution: a super_admin has no gym_id of
-        // its own, so fall back to the gym it is currently acting as.
-        $gymId = $request->user()?->gym_id ?? app(ActingGymContext::class)->gymId();
+        // Mirrors GymScope's gym resolution — see that class.
+        $gymId = app(ActingGymContext::class)->gymId();
         $gym = $gymId ? Gym::query()->find($gymId) : null;
         $subscription = $gym?->currentSubscription;
 

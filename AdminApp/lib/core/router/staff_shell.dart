@@ -69,9 +69,10 @@ class StaffShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).value;
     final actingGym = ref.watch(actingGymControllerProvider);
+    final actingRoleName = ref.watch(actingRoleNameProvider);
     final location = GoRouterState.of(context).matchedLocation;
     final visibleItems = _navItems
-        .where((item) => canAccessNav(user?.roleName, item.key))
+        .where((item) => canAccessNav(actingRoleName, item.key))
         .toList();
     final currentLabel = visibleItems
         .firstWhere(
@@ -80,7 +81,8 @@ class StaffShell extends ConsumerWidget {
               visibleItems.isNotEmpty ? visibleItems.first : _navItems.first,
         )
         .label;
-    final displayGymName = actingGym?.name ?? user?.gymName ?? '';
+    final displayGymName =
+        actingGym?.name ?? user?.soleMembership?.gymName ?? '';
     final scheme = Theme.of(context).colorScheme;
     final tokens = context.tokens;
 

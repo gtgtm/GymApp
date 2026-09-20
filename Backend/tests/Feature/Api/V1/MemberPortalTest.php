@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\Membership;
 use App\Models\MembershipPlan;
 use App\Models\Role;
+use App\Models\UserGymMembership;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\CreatesGymUsers;
 use Tests\TestCase;
@@ -29,6 +30,15 @@ class MemberPortalTest extends TestCase
             'joining_date' => now(),
             'status' => 'active',
         ]);
+
+        // createUser() already made a membership row for $memberUser at
+        // $gym, but with no member_id (it didn't know about $member yet,
+        // which is created above). Link them, mirroring what
+        // GymMembershipService does for a real member signup.
+        UserGymMembership::query()
+            ->where('user_id', $memberUser->id)
+            ->where('gym_id', $gym->id)
+            ->update(['member_id' => $member->id]);
 
         return [$memberUser, $member];
     }

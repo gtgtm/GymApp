@@ -1,31 +1,58 @@
+import 'package:gymapp_admin/features/auth/domain/gym_membership.dart';
+
+/// A logged-in staff identity. One login can now hold ACTIVE memberships at
+/// several gyms, each with its own role (see GymMembership) — so, unlike
+/// before, there is no single fixed roleName/gymName on this class. Callers
+/// that need "the role/gym for the screen currently being shown" must
+/// combine this with whichever gym is currently acting (see
+/// ActingGymController) via [membershipFor] or [soleMembership].
 class StaffUser {
   const StaffUser({
     required this.id,
     required this.name,
     required this.email,
-    required this.gymName,
     required this.roleName,
-    required this.roleLabel,
+    required this.memberships,
   });
 
   factory StaffUser.fromJson(Map<String, dynamic> json) {
     final role = json['role'] as Map<String, dynamic>?;
+    final membershipsJson = json['memberships'] as List<dynamic>? ?? const [];
+
     return StaffUser(
       id: json['id'] as int,
       name: json['name'] as String,
       email: json['email'] as String,
-      gymName: (json['gym'] as Map<String, dynamic>?)?['name'] as String? ?? '',
+      // Platform-level only for super_admin — see UserGymMembership
+      // docblock on the backend. Every other role's per-gym role comes
+      // from `memberships` instead; this field is otherwise unused.
       roleName: role?['name'] as String? ?? '',
-      roleLabel: role?['label'] as String? ?? '',
+      memberships: membershipsJson
+          .map((json) => GymMembership.fromJson(json as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   final int id;
   final String name;
   final String email;
-  final String gymName;
   final String roleName;
-  final String roleLabel;
+  final List<GymMembership> memberships;
 
   bool get isSuperAdmin => roleName == 'super_admin';
+
+  bool get requiresGymSelection => memberships.length > 1;
+
+  /// The only membership this user has, or null if they have zero or more
+  /// than one (in which case a gym must be explicitly chosen — see
+  /// ActingGymController / the gyms picker screen).
+  GymMembership? get soleMembership =>
+      memberships.length == 1 ? memberships.first : null;
+
+  GymMembership? membershipFor(int gymId) {
+    for (final membership in memberships) {
+      if (membership.gymId == gymId) return membership;
+    }
+    return null;
+  }
 }

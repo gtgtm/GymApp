@@ -7,6 +7,7 @@ import 'package:gymapp_admin/core/router/staff_shell.dart';
 import 'package:gymapp_admin/features/attendance/presentation/attendance_screen.dart';
 import 'package:gymapp_admin/features/auth/presentation/auth_controller.dart';
 import 'package:gymapp_admin/features/auth/presentation/login_screen.dart';
+import 'package:gymapp_admin/features/auth/presentation/my_gyms_screen.dart';
 import 'package:gymapp_admin/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:gymapp_admin/features/enquiries/presentation/enquiries_screen.dart';
 import 'package:gymapp_admin/features/equipment/presentation/equipment_screen.dart';
@@ -44,18 +45,39 @@ GoRouter appRouter(Ref ref) {
       final isLoggedIn = user != null;
       final isLoggingIn = state.matchedLocation == '/login';
       final isGymsScreen = state.matchedLocation == '/gyms';
+      final isMyGymsScreen = state.matchedLocation == '/my-gyms';
 
       if (authState.isLoading) return null;
       if (!isLoggedIn && !isLoggingIn) return '/login';
+
       if (isLoggedIn && isLoggingIn) {
-        return user.isSuperAdmin ? '/gyms' : '/dashboard';
+        if (user.isSuperAdmin) return '/gyms';
+        return user.requiresGymSelection ? '/my-gyms' : '/dashboard';
       }
+
+      final actingGym = ref.read(actingGymControllerProvider);
 
       // super_admin has no gym of its own — every gym-scoped screen requires
       // having entered one first via the gym directory (see GymsScreen).
-      final hasEnteredGym = ref.read(actingGymControllerProvider) != null;
-      if (isLoggedIn && user.isSuperAdmin && !hasEnteredGym && !isGymsScreen) {
+      if (isLoggedIn &&
+          user.isSuperAdmin &&
+          actingGym == null &&
+          !isGymsScreen) {
         return '/gyms';
+      }
+
+      // A regular login with more than one membership must explicitly pick
+      // a gym via MyGymsScreen before reaching any gym-scoped route. A
+      // sole-membership login is auto-entered by AuthController right when
+      // the user object first becomes available (login/currentUser), so by
+      // the time redirect() runs, actingGym is already set for that case —
+      // this branch only fires for the genuine multi-gym, none-picked-yet
+      // state.
+      if (isLoggedIn &&
+          !user.isSuperAdmin &&
+          actingGym == null &&
+          !isMyGymsScreen) {
+        return '/my-gyms';
       }
 
       return null;
@@ -63,6 +85,10 @@ GoRouter appRouter(Ref ref) {
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/gyms', builder: (context, state) => const GymsScreen()),
+      GoRoute(
+        path: '/my-gyms',
+        builder: (context, state) => const MyGymsScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) => StaffShell(child: child),
         routes: [

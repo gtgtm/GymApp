@@ -103,4 +103,21 @@ class ReportTest extends TestCase
         $this->assertEquals(2, $response->json('data.summary.leads'));
         $this->assertEquals(50, $response->json('data.summary.conversion_rate'));
     }
+
+    public function test_financial_pdf_export_resolves_the_acting_gym_not_users_gym_id(): void
+    {
+        // Regression test: the PDF header used to read $request->user()->gym,
+        // which no longer exists (users.gym_id was dropped in Phase 4 of the
+        // multi-gym rollout). It must resolve the gym from ActingGymContext
+        // instead, or this 500s with "Attempt to read property on null".
+        $gym = $this->createGym('PDF Test Gym');
+        $admin = $this->createUser($gym, Role::ADMIN);
+
+        $response = $this->actingAs($admin, 'sanctum')->get(
+            '/api/v1/reports/financial/export/pdf?from='.now()->startOfMonth()->toDateString().'&to='.now()->toDateString(),
+        );
+
+        $response->assertOk();
+        $this->assertSame('application/pdf', $response->headers->get('Content-Type'));
+    }
 }
