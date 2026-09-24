@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gymapp_admin/core/permissions/nav_permissions.dart';
 import 'package:gymapp_admin/core/router/staff_bottom_bar.dart';
 import 'package:gymapp_admin/core/theme/app_tokens.dart';
+import 'package:gymapp_admin/core/widgets/confirm_logout.dart';
 import 'package:gymapp_admin/features/auth/presentation/auth_controller.dart';
 import 'package:gymapp_admin/features/auth/presentation/acting_gym_controller.dart';
 
@@ -210,7 +211,7 @@ class StaffShell extends ConsumerWidget {
                   title: Text('Log out', style: TextStyle(color: scheme.error)),
                   onTap: () async {
                     Navigator.of(context).pop();
-                    final confirmed = await _confirmLogout(context);
+                    final confirmed = await confirmLogout(context);
                     if (!confirmed) return;
                     await ref.read(authControllerProvider.notifier).logout();
                   },
@@ -290,33 +291,4 @@ class _DrawerNavTile extends StatelessWidget {
       ),
     );
   }
-}
-
-Future<bool> _confirmLogout(BuildContext context) async {
-  final confirmed = await showDialog<bool>(
-    context: context,
-    builder: (dialogContext) {
-      final scheme = Theme.of(dialogContext).colorScheme;
-
-      return AlertDialog(
-        title: const Text('Log out?'),
-        content: const Text(
-          'You will need to sign in again to use GymBrain on this device.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: TextButton.styleFrom(foregroundColor: scheme.error),
-            child: const Text('Log out'),
-          ),
-        ],
-      );
-    },
-  );
-
-  return confirmed ?? false;
 }

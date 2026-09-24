@@ -57,8 +57,7 @@ const _allActions = [
   ),
 ];
 
-/// One card of up to four icon shortcuts. The first visible action is the
-/// primary one (filled); the rest are tonal.
+/// Staff shortcuts, filtered to what the acting role may do.
 class QuickActions extends StatelessWidget {
   const QuickActions({required this.roleName, super.key});
 
@@ -66,13 +65,47 @@ class QuickActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final items = [
+      for (final action in _allActions)
+        if (action.isAllowedFor(roleName))
+          QuickActionItem(
+            label: action.label,
+            icon: action.icon,
+            // Every shortcut targets a tab inside the shell, so switch to
+            // it (go) rather than stacking it over the dashboard (push).
+            onTap: () => context.go(action.path),
+          ),
+    ];
+
+    return QuickActionsCard(items: items);
+  }
+}
+
+class QuickActionItem {
+  const QuickActionItem({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+}
+
+/// One card of up to four icon shortcuts. The first is the primary one
+/// (filled); the rest are tonal.
+class QuickActionsCard extends StatelessWidget {
+  const QuickActionsCard({required this.items, super.key});
+
+  final List<QuickActionItem> items;
+
+  @override
+  Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final tokens = context.tokens;
-    final actions = _allActions
-        .where((action) => action.isAllowedFor(roleName))
-        .toList();
 
-    if (actions.isEmpty) return const SizedBox.shrink();
+    if (items.isEmpty) return const SizedBox.shrink();
 
     return Container(
       padding: EdgeInsets.symmetric(vertical: tokens.spacingMd),
@@ -84,8 +117,8 @@ class QuickActions extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          for (var i = 0; i < actions.length; i++)
-            _QuickActionButton(action: actions[i], isPrimary: i == 0),
+          for (var i = 0; i < items.length; i++)
+            _QuickActionButton(item: items[i], isPrimary: i == 0),
         ],
       ),
     );
@@ -93,9 +126,9 @@ class QuickActions extends StatelessWidget {
 }
 
 class _QuickActionButton extends StatelessWidget {
-  const _QuickActionButton({required this.action, required this.isPrimary});
+  const _QuickActionButton({required this.item, required this.isPrimary});
 
-  final QuickAction action;
+  final QuickActionItem item;
   final bool isPrimary;
 
   @override
@@ -106,12 +139,10 @@ class _QuickActionButton extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: action.label,
+      label: item.label,
       child: InkWell(
         borderRadius: radius,
-        // Every shortcut targets a tab inside the shell, so switch to it
-        // (go) rather than stacking it over the dashboard (push).
-        onTap: () => context.go(action.path),
+        onTap: item.onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
           child: Column(
@@ -135,13 +166,13 @@ class _QuickActionButton extends StatelessWidget {
                       : null,
                 ),
                 child: Icon(
-                  action.icon,
+                  item.icon,
                   color: isPrimary ? scheme.onPrimary : scheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                action.label,
+                item.label,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,

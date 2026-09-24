@@ -8,7 +8,7 @@ Gym Management & Member Management SaaS platform for gym owners, trainers, recep
 GymApp/
 ├── Backend/     Laravel 13 API (PHP 8.3, MySQL, Sanctum token auth)
 ├── Admin/       Next.js admin dashboard (TypeScript, Tailwind, shadcn/ui)
-└── MobileApp/   Flutter member portal (scaffolded, screens land in a later phase)
+└── AdminApp/    Flutter mobile app for gym staff and members (GymBrain)
 ```
 
 ## Backend (Laravel API)
@@ -31,6 +31,8 @@ Seeded demo accounts (password: `password`):
 | Admin | admin@demofitness.test |
 | Receptionist | reception@demofitness.test |
 | Trainer | trainer@demofitness.test |
+| Member (also trainer at Iron Paradise) | member@demofitness.test |
+| Admin (second gym) | admin@ironparadise.test |
 
 Run tests: `php artisan test`
 
@@ -45,14 +47,22 @@ npm run dev
 
 Visit http://localhost:3000 and log in with a seeded account above.
 
-## MobileApp (Flutter member portal)
+## AdminApp (Flutter mobile app — staff and members)
 
-Scaffolded only in Phase 1. Screens (membership, payments, attendance QR, workout/diet plans) are implemented in a later phase.
+One app for everyone at a gym. What a login sees depends on its role at the
+gym it is acting as (a person can belong to several gyms):
+
+- **Admin / receptionist / trainer** — dashboard, members, check-in (QR
+  scan), billing, and the rest of the staff screens, filtered by role.
+- **Member** — their membership and renewal request, check-in QR code,
+  attendance, workout and diet plans, progress, payments, notifications.
+
+The platform owner (super_admin) uses the web Admin dashboard instead.
 
 ```bash
-cd MobileApp
+cd AdminApp
 flutter pub get
-flutter run
+flutter run   # Android emulator: --dart-define=API_BASE_URL=http://10.0.2.2:8000/api/v1
 ```
 
 ## Architecture notes

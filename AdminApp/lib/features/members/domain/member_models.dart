@@ -1,6 +1,6 @@
 enum ExpiryBucket { green, yellow, orange, red, unknown }
 
-ExpiryBucket _parseExpiryBucket(String? value) {
+ExpiryBucket parseExpiryBucket(String? value) {
   return switch (value) {
     'green' => ExpiryBucket.green,
     'yellow' => ExpiryBucket.yellow,
@@ -91,7 +91,7 @@ class Member {
       bloodGroup: json['blood_group'] as String?,
       notes: json['notes'] as String?,
       status: json['status'] as String,
-      expiryBucket: _parseExpiryBucket(json['expiry_bucket'] as String?),
+      expiryBucket: parseExpiryBucket(json['expiry_bucket'] as String?),
       currentMembership: json['current_membership'] == null
           ? null
           : CurrentMembership.fromJson(

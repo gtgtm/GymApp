@@ -46,13 +46,13 @@ class DashboardHeader extends StatelessWidget {
             ],
           ),
         ),
-        _HeaderButton(
+        HeaderButton(
           tooltip: 'Search',
           onTap: () => context.push('/search'),
           child: Icon(Icons.search, color: scheme.onSurface, size: 22),
         ),
         SizedBox(width: tokens.spacingSm),
-        _HeaderButton(
+        HeaderButton(
           tooltip: 'Menu',
           filled: true,
           onTap: () => Scaffold.of(context).openEndDrawer(),
@@ -69,8 +69,9 @@ class DashboardHeader extends StatelessWidget {
   }
 }
 
-class _HeaderButton extends StatelessWidget {
-  const _HeaderButton({
+/// A 44px square header action; [filled] makes it the primary (orange) one.
+class HeaderButton extends StatelessWidget {
+  const HeaderButton({
     required this.tooltip,
     required this.onTap,
     required this.child,

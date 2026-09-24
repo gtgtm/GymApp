@@ -45,9 +45,18 @@ bool canAccessNav(String? roleName, NavKey key) {
   return _roleNavAccess[roleName]?.contains(key) ?? false;
 }
 
-/// Roles this app accepts at login. Member accounts must use the member app;
-/// the platform owner (super_admin) must use the web dashboard.
+/// Gym staff roles — these get the staff shell (dashboard, members, ...).
 const staffRoleNames = ['admin', 'receptionist', 'trainer'];
+
+/// A gym member — gets the member portal shell (their own membership,
+/// QR check-in code, plans, progress) instead of the staff screens.
+const memberRoleName = 'member';
+
+/// Every per-gym role this app accepts at login. The platform owner
+/// (super_admin) has no gym role and must use the web dashboard.
+const appRoleNames = [...staffRoleNames, memberRoleName];
+
+bool isMemberRole(String? roleName) => roleName == memberRoleName;
 
 /// Write actions gated beyond "can see the screen". Mirrors the backend
 /// FormRequest authorize() checks (StoreMemberRequest,

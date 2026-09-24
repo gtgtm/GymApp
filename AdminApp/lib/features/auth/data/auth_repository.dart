@@ -42,11 +42,10 @@ class AuthRepository {
       );
     }
 
-    if (!_hasStaffAccess(user)) {
-      // Do not persist a token for an account this app doesn't support —
-      // member-only accounts belong in the member portal app instead.
+    if (!_hasAppAccess(user)) {
+      // Do not persist a token for an account with no active gym role.
       throw const ApiException(
-        'This app is for gym staff. Members should use the GymBrain member app.',
+        'This account is not active at any gym. Contact your gym to get access.',
       );
     }
 
@@ -72,7 +71,7 @@ class AuthRepository {
         (data) => StaffUser.fromJson(data as Map<String, dynamic>),
       );
 
-      if (!_hasStaffAccess(user)) {
+      if (!_hasAppAccess(user)) {
         await _tokenStorage.clear();
         return null;
       }
@@ -124,15 +123,14 @@ class AuthRepository {
     );
   }
 
-  /// True when this login can use the staff app at all: it has at least one
-  /// membership in a staff role (see nav_permissions.dart's
-  /// staffRoleNames). A person who is ONLY a member everywhere they belong
-  /// must use the member portal app instead — but a membership-list is not
-  /// "one role" any more, so this checks each membership rather than a
-  /// single top-level roleName.
-  bool _hasStaffAccess(StaffUser user) {
+  /// True when this login has at least one active membership in a role
+  /// this app serves — staff or member (see nav_permissions.dart's
+  /// appRoleNames). Which experience they get is decided per acting gym,
+  /// since the same person can be a trainer at one gym and a member at
+  /// another.
+  bool _hasAppAccess(StaffUser user) {
     return user.memberships.any(
-      (membership) => staffRoleNames.contains(membership.roleName),
+      (membership) => appRoleNames.contains(membership.roleName),
     );
   }
 }

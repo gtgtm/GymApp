@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:gymapp_admin/core/api/acting_gym.dart';
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
+import 'package:gymapp_admin/core/widgets/confirm_logout.dart';
 import 'package:gymapp_admin/core/widgets/empty_state.dart';
 import 'package:gymapp_admin/features/auth/domain/gym_membership.dart';
 import 'package:gymapp_admin/features/auth/presentation/auth_controller.dart';
@@ -27,7 +28,10 @@ class MyGymsScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Log out',
-            onPressed: () => ref.read(authControllerProvider.notifier).logout(),
+            onPressed: () async {
+              if (!await confirmLogout(context)) return;
+              await ref.read(authControllerProvider.notifier).logout();
+            },
           ),
         ],
       ),
@@ -121,6 +125,10 @@ class _MembershipCard extends ConsumerWidget {
                     );
                 context.go('/dashboard');
               },
+              // The theme's buttons are full-width (infinite minimum
+              // width), which a Row can't lay out — the whole list would
+              // render blank.
+              style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),
               child: const Text('Enter'),
             ),
           ],
@@ -173,6 +181,7 @@ class _PendingMembershipCard extends ConsumerWidget {
                   );
                 }
               },
+              style: OutlinedButton.styleFrom(minimumSize: const Size(0, 40)),
               child: const Text('Accept'),
             ),
           ],

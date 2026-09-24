@@ -10,23 +10,26 @@ void main() {
   // has no real implementation in the widget-test harness. Without this
   // mock, the read() call in AuthController.build() awaits forever and
   // pumpAndSettle times out.
-  const secureStorageChannel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  const secureStorageChannel = MethodChannel(
+    'plugins.it_nomads.com/flutter_secure_storage',
+  );
 
   setUp(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-      secureStorageChannel,
-      (call) async => call.method == 'read' ? null : <String, String>{},
-    );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          secureStorageChannel,
+          (call) async => call.method == 'read' ? null : <String, String>{},
+        );
   });
 
   tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-      secureStorageChannel,
-      null,
-    );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(secureStorageChannel, null);
   });
 
-  testWidgets('App boots to the login screen when logged out', (WidgetTester tester) async {
+  testWidgets('App boots to the login screen when logged out', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const ProviderScope(child: GymBrainStaff()));
     await tester.pumpAndSettle();
 

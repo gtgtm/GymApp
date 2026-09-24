@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:gymapp_admin/core/permissions/nav_permissions.dart';
 import 'package:gymapp_admin/core/router/staff_shell.dart';
 import 'package:gymapp_admin/features/attendance/presentation/attendance_screen.dart';
 import 'package:gymapp_admin/features/auth/presentation/auth_controller.dart';
@@ -12,6 +13,13 @@ import 'package:gymapp_admin/features/dashboard/presentation/dashboard_screen.da
 import 'package:gymapp_admin/features/enquiries/presentation/enquiries_screen.dart';
 import 'package:gymapp_admin/features/equipment/presentation/equipment_screen.dart';
 import 'package:gymapp_admin/features/expenses/presentation/expenses_screen.dart';
+import 'package:gymapp_admin/features/member_portal/presentation/member_home_screen.dart';
+import 'package:gymapp_admin/features/member_portal/presentation/member_notifications_screen.dart';
+import 'package:gymapp_admin/features/member_portal/presentation/member_plan_screens.dart';
+import 'package:gymapp_admin/features/member_portal/presentation/member_profile_screen.dart';
+import 'package:gymapp_admin/features/member_portal/presentation/member_progress_screen.dart';
+import 'package:gymapp_admin/features/member_portal/presentation/member_qr_screen.dart';
+import 'package:gymapp_admin/features/member_portal/presentation/member_shell.dart';
 import 'package:gymapp_admin/features/members/presentation/member_detail_screen.dart';
 import 'package:gymapp_admin/features/members/presentation/members_screen.dart';
 import 'package:gymapp_admin/features/payments/presentation/payments_screen.dart';
@@ -76,6 +84,17 @@ GoRouter appRouter(Ref ref) {
         return '/my-gyms';
       }
 
+      // The role at the acting gym decides which app the person sees: a
+      // member gets the member portal, staff get the staff screens. The
+      // same login can be a trainer at one gym and a member at another,
+      // so this is re-evaluated whenever the acting gym changes.
+      if (actingGym != null && !isMyGymsScreen) {
+        final isMember = isMemberRole(ref.read(actingRoleNameProvider));
+        final onMemberRoute = MemberRoutes.contains(state.matchedLocation);
+        if (isMember && !onMemberRoute) return MemberRoutes.home;
+        if (!isMember && onMemberRoute) return '/dashboard';
+      }
+
       return null;
     },
     routes: [
@@ -83,6 +102,30 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/my-gyms',
         builder: (context, state) => const MyGymsScreen(),
+      ),
+      ShellRoute(
+        builder: (context, state, child) => MemberShellHost(child: child),
+        routes: [
+          _tabRoute(MemberRoutes.home, (state) => const MemberHomeScreen()),
+          _tabRoute(
+            MemberRoutes.workout,
+            (state) => const MemberWorkoutScreen(),
+          ),
+          _tabRoute(MemberRoutes.qr, (state) => const MemberQrScreen()),
+          _tabRoute(MemberRoutes.diet, (state) => const MemberDietScreen()),
+          _tabRoute(
+            MemberRoutes.profile,
+            (state) => const MemberProfileScreen(),
+          ),
+          _tabRoute(
+            MemberRoutes.progress,
+            (state) => const MemberProgressScreen(),
+          ),
+          _tabRoute(
+            MemberRoutes.notifications,
+            (state) => const MemberNotificationsScreen(),
+          ),
+        ],
       ),
       ShellRoute(
         builder: (context, state, child) => StaffShellHost(child: child),

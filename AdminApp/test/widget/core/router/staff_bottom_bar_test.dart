@@ -19,13 +19,12 @@ Future<void> _pumpBar(WidgetTester tester, String role) {
 List<String> _labelsInOrder(WidgetTester tester) {
   const labels = ['Home', 'Members', 'Check-in', 'Billing', 'More'];
   final found = labels.where((label) => find.text(label).evaluate().isNotEmpty);
-  return found.toList()
-    ..sort(
-      (a, b) => tester
-          .getCenter(find.text(a))
-          .dx
-          .compareTo(tester.getCenter(find.text(b)).dx),
-    );
+  return found.toList()..sort(
+    (a, b) => tester
+        .getCenter(find.text(a))
+        .dx
+        .compareTo(tester.getCenter(find.text(b)).dx),
+  );
 }
 
 void main() {

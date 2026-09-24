@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -10,6 +9,7 @@ import 'package:gymapp_admin/core/widgets/empty_state.dart';
 import 'package:gymapp_admin/features/progress/domain/progress_models.dart';
 import 'package:gymapp_admin/features/progress/presentation/add_measurement_sheet.dart';
 import 'package:gymapp_admin/features/progress/presentation/progress_providers.dart';
+import 'package:gymapp_admin/features/progress/presentation/weight_trend_chart.dart';
 
 class ProgressTab extends ConsumerStatefulWidget {
   const ProgressTab({required this.memberId, super.key});
@@ -92,68 +92,8 @@ class _ProgressTabState extends ConsumerState<ProgressTab> {
                 ),
               );
             }
-            final scheme = Theme.of(context).colorScheme;
-            final labelStyle = TextStyle(
-              color: scheme.onSurfaceVariant,
-              fontSize: 11,
-            );
-
-            return SizedBox(
-              height: 180,
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (_) =>
-                        FlLine(color: scheme.outline, strokeWidth: 1),
-                  ),
-                  titlesData: FlTitlesData(
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 36,
-                        getTitlesWidget: (value, meta) =>
-                            Text(value.toStringAsFixed(0), style: labelStyle),
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      isCurved: true,
-                      color: scheme.primary,
-                      barWidth: 3,
-                      dotData: FlDotData(
-                        show: true,
-                        getDotPainter: (spot, percent, bar, index) =>
-                            FlDotCirclePainter(
-                              radius: 4,
-                              color: scheme.primary,
-                              strokeWidth: 0,
-                            ),
-                      ),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: scheme.primary.withValues(alpha: 0.12),
-                      ),
-                      spots: [
-                        for (var i = 0; i < withWeight.length; i++)
-                          FlSpot(i.toDouble(), withWeight[i].weightKg!),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+            return WeightTrendChart(
+              weights: [for (final m in withWeight) m.weightKg!],
             );
           },
         ),
