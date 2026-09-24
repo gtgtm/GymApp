@@ -102,9 +102,16 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    QrScannerView(
-                      onDetected: (value) =>
-                          unawaited(_handleQrDetected(value)),
+                    // The scanner is square; Center + Expanded lets it
+                    // shrink to whichever of width/height is smaller
+                    // instead of overflowing short screens.
+                    Expanded(
+                      child: Center(
+                        child: QrScannerView(
+                          onDetected: (value) =>
+                              unawaited(_handleQrDetected(value)),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Text(

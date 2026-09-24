@@ -16,8 +16,7 @@ import 'package:gymapp_admin/features/members/presentation/member_detail_screen.
 import 'package:gymapp_admin/features/members/presentation/members_screen.dart';
 import 'package:gymapp_admin/features/payments/presentation/payments_screen.dart';
 import 'package:gymapp_admin/features/plans/presentation/plans_screen.dart';
-import 'package:gymapp_admin/features/platform/presentation/acting_gym_controller.dart';
-import 'package:gymapp_admin/features/platform/presentation/gyms_screen.dart';
+import 'package:gymapp_admin/features/auth/presentation/acting_gym_controller.dart';
 import 'package:gymapp_admin/features/reports/presentation/reports_screen.dart';
 import 'package:gymapp_admin/features/search/presentation/search_screen.dart';
 import 'package:gymapp_admin/features/trainers/presentation/trainers_screen.dart';
@@ -32,6 +31,17 @@ class _AuthRefreshListenable extends ChangeNotifier {
   }
 }
 
+/// A top-level tab inside the shell. Switching tabs replaces the page
+/// instantly: the default iOS slide would briefly show the previous tab
+/// behind the new one, which reads as a broken "push" animation.
+GoRoute _tabRoute(String path, Widget Function(GoRouterState state) build) {
+  return GoRoute(
+    path: path,
+    pageBuilder: (context, state) =>
+        NoTransitionPage(key: state.pageKey, child: build(state)),
+  );
+}
+
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
   final refreshListenable = _AuthRefreshListenable(ref);
@@ -44,27 +54,16 @@ GoRouter appRouter(Ref ref) {
       final user = authState.value;
       final isLoggedIn = user != null;
       final isLoggingIn = state.matchedLocation == '/login';
-      final isGymsScreen = state.matchedLocation == '/gyms';
       final isMyGymsScreen = state.matchedLocation == '/my-gyms';
 
       if (authState.isLoading) return null;
       if (!isLoggedIn && !isLoggingIn) return '/login';
 
       if (isLoggedIn && isLoggingIn) {
-        if (user.isSuperAdmin) return '/gyms';
         return user.requiresGymSelection ? '/my-gyms' : '/dashboard';
       }
 
       final actingGym = ref.read(actingGymControllerProvider);
-
-      // super_admin has no gym of its own — every gym-scoped screen requires
-      // having entered one first via the gym directory (see GymsScreen).
-      if (isLoggedIn &&
-          user.isSuperAdmin &&
-          actingGym == null &&
-          !isGymsScreen) {
-        return '/gyms';
-      }
 
       // A regular login with more than one membership must explicitly pick
       // a gym via MyGymsScreen before reaching any gym-scoped route. A
@@ -73,10 +72,7 @@ GoRouter appRouter(Ref ref) {
       // the time redirect() runs, actingGym is already set for that case —
       // this branch only fires for the genuine multi-gym, none-picked-yet
       // state.
-      if (isLoggedIn &&
-          !user.isSuperAdmin &&
-          actingGym == null &&
-          !isMyGymsScreen) {
+      if (isLoggedIn && actingGym == null && !isMyGymsScreen) {
         return '/my-gyms';
       }
 
@@ -84,86 +80,78 @@ GoRouter appRouter(Ref ref) {
     },
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(path: '/gyms', builder: (context, state) => const GymsScreen()),
       GoRoute(
         path: '/my-gyms',
         builder: (context, state) => const MyGymsScreen(),
       ),
       ShellRoute(
-        builder: (context, state, child) => StaffShell(child: child),
+        builder: (context, state, child) => StaffShellHost(child: child),
         routes: [
-          GoRoute(
-            path: '/dashboard',
-            builder: (context, state) => const DashboardScreen(),
-          ),
-          GoRoute(
-            path: '/members',
-            builder: (context, state) => MembersScreen(
+          _tabRoute('/dashboard', (state) => const DashboardScreen()),
+          _tabRoute(
+            '/members',
+            (state) => MembersScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
               expiryFilter: state.uri.queryParameters['filter'],
             ),
           ),
-          GoRoute(
-            path: '/enquiries',
-            builder: (context, state) => EnquiriesScreen(
+          _tabRoute(
+            '/enquiries',
+            (state) => EnquiriesScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
             ),
           ),
-          GoRoute(
-            path: '/trials',
-            builder: (context, state) => TrialsScreen(
+          _tabRoute(
+            '/trials',
+            (state) => TrialsScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
             ),
           ),
-          GoRoute(
-            path: '/trainers',
-            builder: (context, state) => TrainersScreen(
+          _tabRoute(
+            '/trainers',
+            (state) => TrainersScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
             ),
           ),
-          GoRoute(
-            path: '/plans',
-            builder: (context, state) => PlansScreen(
+          _tabRoute(
+            '/plans',
+            (state) => PlansScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
             ),
           ),
-          GoRoute(
-            path: '/payments',
-            builder: (context, state) => PaymentsScreen(
+          _tabRoute(
+            '/payments',
+            (state) => PaymentsScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
             ),
           ),
-          GoRoute(
-            path: '/attendance',
-            builder: (context, state) => const AttendanceScreen(),
-          ),
-          GoRoute(
-            path: '/expenses',
-            builder: (context, state) => ExpensesScreen(
+          _tabRoute('/attendance', (state) => const AttendanceScreen()),
+          _tabRoute(
+            '/expenses',
+            (state) => ExpensesScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
             ),
           ),
-          GoRoute(
-            path: '/equipment',
-            builder: (context, state) => EquipmentScreen(
+          _tabRoute(
+            '/equipment',
+            (state) => EquipmentScreen(
               openCreateOnLoad: state.uri.queryParameters['new'] == '1',
             ),
           ),
+          _tabRoute('/reports', (state) => const ReportsScreen()),
+          // Pushed detail screens also live inside the shell so the bottom
+          // nav bar stays visible on every screen.
           GoRoute(
-            path: '/reports',
-            builder: (context, state) => const ReportsScreen(),
+            path: '/members/:id',
+            builder: (context, state) => MemberDetailScreen(
+              memberId: int.parse(state.pathParameters['id']!),
+            ),
+          ),
+          GoRoute(
+            path: '/search',
+            builder: (context, state) => const SearchScreen(),
           ),
         ],
-      ),
-      GoRoute(
-        path: '/members/:id',
-        builder: (context, state) => MemberDetailScreen(
-          memberId: int.parse(state.pathParameters['id']!),
-        ),
-      ),
-      GoRoute(
-        path: '/search',
-        builder: (context, state) => const SearchScreen(),
       ),
     ],
   );

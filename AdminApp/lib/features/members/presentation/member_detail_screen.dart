@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:gymapp_admin/core/permissions/nav_permissions.dart';
 import 'package:gymapp_admin/core/widgets/app_list_card.dart';
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
 import 'package:gymapp_admin/core/widgets/empty_state.dart';
+import 'package:gymapp_admin/features/auth/presentation/acting_gym_controller.dart';
 import 'package:gymapp_admin/features/diet/presentation/diet_tab.dart';
 import 'package:gymapp_admin/features/members/domain/member_models.dart';
 import 'package:gymapp_admin/features/members/presentation/expiry_badge.dart';
@@ -130,13 +132,17 @@ class _OverviewTab extends StatelessWidget {
   }
 }
 
-class _MembershipTab extends StatelessWidget {
+class _MembershipTab extends ConsumerWidget {
   const _MembershipTab({required this.member});
 
   final Member member;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final canRenew = canPerform(
+      ref.watch(actingRoleNameProvider),
+      StaffAction.renewMembership,
+    );
     final membership = member.currentMembership;
     final dateFormat = DateFormat.yMMMd();
 
@@ -171,12 +177,14 @@ class _MembershipTab extends StatelessWidget {
           ),
           _InfoRow(label: 'Status', value: membership.status),
         ],
-        const SizedBox(height: 20),
-        FilledButton.icon(
-          onPressed: () => showRenewMembershipSheet(context, member.id),
-          icon: const Icon(Icons.autorenew),
-          label: const Text('Renew Membership'),
-        ),
+        if (canRenew) ...[
+          const SizedBox(height: 20),
+          FilledButton.icon(
+            onPressed: () => showRenewMembershipSheet(context, member.id),
+            icon: const Icon(Icons.autorenew),
+            label: const Text('Renew Membership'),
+          ),
+        ],
       ],
     );
   }

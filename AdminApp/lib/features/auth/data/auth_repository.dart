@@ -29,7 +29,18 @@ class AuthRepository {
     );
 
     final token = result['token'] as String;
-    final user = StaffUser.fromJson(result['user'] as Map<String, dynamic>);
+    // /login returns `memberships` alongside `user` (unlike /me, which nests
+    // it inside the user object) — merge it in so StaffUser sees them.
+    final user = StaffUser.fromJson({
+      ...result['user'] as Map<String, dynamic>,
+      'memberships': result['memberships'] ?? const [],
+    });
+
+    if (user.isSuperAdmin) {
+      throw const ApiException(
+        'Platform owner accounts are not supported here. Use the GymBrain web dashboard.',
+      );
+    }
 
     if (!_hasStaffAccess(user)) {
       // Do not persist a token for an account this app doesn't support —
@@ -113,16 +124,13 @@ class AuthRepository {
     );
   }
 
-  /// True when this login can use the staff app at all: either super_admin
-  /// (platform-level, no gym of its own), or it has at least one
+  /// True when this login can use the staff app at all: it has at least one
   /// membership in a staff role (see nav_permissions.dart's
   /// staffRoleNames). A person who is ONLY a member everywhere they belong
   /// must use the member portal app instead — but a membership-list is not
   /// "one role" any more, so this checks each membership rather than a
   /// single top-level roleName.
   bool _hasStaffAccess(StaffUser user) {
-    if (user.isSuperAdmin) return true;
-
     return user.memberships.any(
       (membership) => staffRoleNames.contains(membership.roleName),
     );

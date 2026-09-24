@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:gymapp_admin/core/permissions/nav_permissions.dart';
+import 'package:gymapp_admin/core/router/staff_bottom_bar.dart';
 import 'package:gymapp_admin/core/theme/app_tokens.dart';
 import 'package:gymapp_admin/features/auth/presentation/auth_controller.dart';
-import 'package:gymapp_admin/features/platform/presentation/acting_gym_controller.dart';
+import 'package:gymapp_admin/features/auth/presentation/acting_gym_controller.dart';
 
 class _NavItem {
   const _NavItem(this.path, this.key, this.icon, this.label);
@@ -60,6 +61,27 @@ const _navItems = [
   _NavItem('/reports', NavKey.reports, Icons.bar_chart_outlined, 'Reports'),
 ];
 
+bool _ownAppBarRoute(String location) =>
+    location == '/dashboard' ||
+    location == '/search' ||
+    location.startsWith('/members/');
+
+/// Rebuilds [StaffShell] on every navigation, including pushes inside the
+/// shell, which don't rebuild the ShellRoute builder by themselves.
+class StaffShellHost extends StatelessWidget {
+  const StaffShellHost({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: GoRouter.of(context).routerDelegate,
+      builder: (context, _) => StaffShell(child: child),
+    );
+  }
+}
+
 class StaffShell extends ConsumerWidget {
   const StaffShell({required this.child, super.key});
 
@@ -70,7 +92,10 @@ class StaffShell extends ConsumerWidget {
     final user = ref.watch(authControllerProvider).value;
     final actingGym = ref.watch(actingGymControllerProvider);
     final actingRoleName = ref.watch(actingRoleNameProvider);
-    final location = GoRouterState.of(context).matchedLocation;
+    // GoRouterState.of(context) is the shell's own route, which goes stale
+    // when a screen is pushed inside the shell; the router's state is
+    // whatever is actually on top.
+    final location = GoRouter.of(context).state.matchedLocation;
     final visibleItems = _navItems
         .where((item) => canAccessNav(actingRoleName, item.key))
         .toList();
@@ -86,53 +111,48 @@ class StaffShell extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
     final tokens = context.tokens;
 
+    // The dashboard draws its own header, and pushed screens (member
+    // detail, search) bring their own AppBar with a back button.
+    final showAppBar = !_ownAppBarRoute(location);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          currentLabel.toUpperCase(),
-          style: const TextStyle(letterSpacing: 1.0),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            color: scheme.primary,
-            onPressed: () => context.push('/search'),
-          ),
-        ],
-      ),
-      bottomNavigationBar: actingGym == null
+      appBar: !showAppBar
           ? null
-          : Material(
-              color: scheme.tertiaryContainer,
-              child: SafeArea(
-                top: false,
-                child: ListTile(
-                  dense: true,
-                  leading: Icon(
-                    Icons.visibility_outlined,
-                    color: scheme.tertiary,
-                  ),
-                  title: Text('Viewing: ${actingGym.name}'),
-                  trailing: TextButton(
-                    onPressed: () {
-                      ref.read(actingGymControllerProvider.notifier).exit();
-                      context.go('/gyms');
-                    },
-                    child: const Text('Exit'),
-                  ),
-                ),
+          : AppBar(
+              // The menu opens from the right via the "More" tab, so no
+              // hamburger in the header.
+              automaticallyImplyLeading: false,
+              title: Text(
+                currentLabel.toUpperCase(),
+                style: const TextStyle(letterSpacing: 1.0),
               ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  color: scheme.primary,
+                  onPressed: () => context.push('/search'),
+                ),
+              ],
             ),
-      drawer: Drawer(
+      bottomNavigationBar: StaffBottomBar(
+        location: location,
+        roleName: actingRoleName,
+      ),
+      endDrawer: Drawer(
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DrawerHeader(
-                decoration: BoxDecoration(color: scheme.surface),
+              // Compact header: DrawerHeader's fixed ~160px height left a
+              // large empty gap above the brand.
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  border: Border(bottom: BorderSide(color: scheme.outline)),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       'GYMBRAIN',
@@ -170,6 +190,19 @@ class StaffShell extends ConsumerWidget {
                 ),
               ),
               Divider(height: 1, color: scheme.outline),
+              if (user?.requiresGymSelection ?? false)
+                ListTile(
+                  leading: Icon(
+                    Icons.swap_horiz,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                  title: const Text('Switch gym'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    ref.read(actingGymControllerProvider.notifier).exit();
+                    context.go('/my-gyms');
+                  },
+                ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: tokens.spacingXs),
                 child: ListTile(
@@ -177,6 +210,8 @@ class StaffShell extends ConsumerWidget {
                   title: Text('Log out', style: TextStyle(color: scheme.error)),
                   onTap: () async {
                     Navigator.of(context).pop();
+                    final confirmed = await _confirmLogout(context);
+                    if (!confirmed) return;
                     await ref.read(authControllerProvider.notifier).logout();
                   },
                 ),
@@ -255,4 +290,33 @@ class _DrawerNavTile extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<bool> _confirmLogout(BuildContext context) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) {
+      final scheme = Theme.of(dialogContext).colorScheme;
+
+      return AlertDialog(
+        title: const Text('Log out?'),
+        content: const Text(
+          'You will need to sign in again to use GymBrain on this device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(foregroundColor: scheme.error),
+            child: const Text('Log out'),
+          ),
+        ],
+      );
+    },
+  );
+
+  return confirmed ?? false;
 }

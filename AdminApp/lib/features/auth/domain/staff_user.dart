@@ -23,9 +23,8 @@ class StaffUser {
       id: json['id'] as int,
       name: json['name'] as String,
       email: json['email'] as String,
-      // Platform-level only for super_admin — see UserGymMembership
-      // docblock on the backend. Every other role's per-gym role comes
-      // from `memberships` instead; this field is otherwise unused.
+      // Only used to detect (and reject) a platform-owner super_admin
+      // login — per-gym roles come from `memberships` instead.
       roleName: role?['name'] as String? ?? '',
       memberships: membershipsJson
           .map((json) => GymMembership.fromJson(json as Map<String, dynamic>))

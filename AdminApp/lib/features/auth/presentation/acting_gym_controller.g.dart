@@ -51,7 +51,7 @@ final class ActingGymControllerProvider
 }
 
 String _$actingGymControllerHash() =>
-    r'0f44705451af8bbc0f28774428d5a951f9291514';
+    r'1e48785ae25782f260a6f5c409ebbfde79510a61';
 
 /// Riverpod-visible mirror of ActingGymHub so widgets can watch/rebuild on
 /// enter/exit. ApiClient reads the hub directly (it can't depend on
@@ -77,30 +77,27 @@ abstract class _$ActingGymController extends $Notifier<ActingGym?> {
 
 /// The role that applies to the gym currently being acted as — the answer
 /// to "what can this login do right now", which nav gating and dashboard
-/// variants both need. A super_admin acting as a gym is treated as that
-/// gym's admin (mirrors User::hasRole() on the backend); everyone else's
-/// role comes from whichever membership matches the acting gym, or their
-/// sole membership if none has been explicitly entered yet.
+/// variants both need. It comes from whichever membership matches the
+/// acting gym, or the sole membership if none has been explicitly entered
+/// yet.
 
 @ProviderFor(actingRoleName)
 final actingRoleNameProvider = ActingRoleNameProvider._();
 
 /// The role that applies to the gym currently being acted as — the answer
 /// to "what can this login do right now", which nav gating and dashboard
-/// variants both need. A super_admin acting as a gym is treated as that
-/// gym's admin (mirrors User::hasRole() on the backend); everyone else's
-/// role comes from whichever membership matches the acting gym, or their
-/// sole membership if none has been explicitly entered yet.
+/// variants both need. It comes from whichever membership matches the
+/// acting gym, or the sole membership if none has been explicitly entered
+/// yet.
 
 final class ActingRoleNameProvider
     extends $FunctionalProvider<String?, String?, String?>
     with $Provider<String?> {
   /// The role that applies to the gym currently being acted as — the answer
   /// to "what can this login do right now", which nav gating and dashboard
-  /// variants both need. A super_admin acting as a gym is treated as that
-  /// gym's admin (mirrors User::hasRole() on the backend); everyone else's
-  /// role comes from whichever membership matches the acting gym, or their
-  /// sole membership if none has been explicitly entered yet.
+  /// variants both need. It comes from whichever membership matches the
+  /// acting gym, or the sole membership if none has been explicitly entered
+  /// yet.
   ActingRoleNameProvider._()
     : super(
         from: null,
@@ -134,4 +131,4 @@ final class ActingRoleNameProvider
   }
 }
 
-String _$actingRoleNameHash() => r'e065fdd316a5124803d42414580602538881081a';
+String _$actingRoleNameHash() => r'7a8430fd5baba33c3b278bf9733b8b345024c379';

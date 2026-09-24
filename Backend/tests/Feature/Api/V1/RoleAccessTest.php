@@ -73,4 +73,22 @@ class RoleAccessTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function test_trainer_cannot_renew_a_membership(): void
+    {
+        $gym = $this->createGym();
+        $trainer = $this->createUser($gym, Role::TRAINER);
+        $member = \App\Models\Member::query()->create([
+            'gym_id' => $gym->id,
+            'member_code' => 'MEM-1',
+            'full_name' => 'Renew Me',
+            'mobile' => '9444444444',
+            'joining_date' => now(),
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($trainer, 'sanctum')->postJson("/api/v1/members/{$member->id}/renew", []);
+
+        $response->assertForbidden();
+    }
 }

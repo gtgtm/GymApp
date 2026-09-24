@@ -15,7 +15,7 @@ class ActingGymController extends _$ActingGymController {
   ActingGym? build() {
     // Login/logout/401 all clear ActingGymHub (see AuthController); mirror
     // that here so this state and the header ApiClient sends never drift.
-    // A regular (non-super_admin) login with exactly ONE membership is
+    // A login with exactly ONE membership is
     // auto-entered here too — no picker needed, matching this app's
     // behaviour from before multi-gym memberships existed. A login with
     // zero or several memberships is left unset: zero means nothing to
@@ -28,7 +28,7 @@ class ActingGymController extends _$ActingGymController {
         return;
       }
 
-      final sole = user.isSuperAdmin ? null : user.soleMembership;
+      final sole = user.soleMembership;
       if (sole != null) {
         enter(ActingGym(id: sole.gymId, name: sole.gymName));
       }
@@ -50,20 +50,15 @@ class ActingGymController extends _$ActingGymController {
 
 /// The role that applies to the gym currently being acted as — the answer
 /// to "what can this login do right now", which nav gating and dashboard
-/// variants both need. A super_admin acting as a gym is treated as that
-/// gym's admin (mirrors User::hasRole() on the backend); everyone else's
-/// role comes from whichever membership matches the acting gym, or their
-/// sole membership if none has been explicitly entered yet.
+/// variants both need. It comes from whichever membership matches the
+/// acting gym, or the sole membership if none has been explicitly entered
+/// yet.
 @riverpod
 String? actingRoleName(Ref ref) {
   final user = ref.watch(authControllerProvider).value;
   if (user == null) return null;
 
   final actingGym = ref.watch(actingGymControllerProvider);
-
-  if (user.isSuperAdmin) {
-    return actingGym != null ? 'admin' : null;
-  }
 
   if (actingGym != null) {
     return user.membershipFor(actingGym.id)?.roleName;

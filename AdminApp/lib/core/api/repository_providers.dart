@@ -10,7 +10,6 @@ import 'package:gymapp_admin/features/expenses/data/expense_repository.dart';
 import 'package:gymapp_admin/features/members/data/member_repository.dart';
 import 'package:gymapp_admin/features/payments/data/payment_repository.dart';
 import 'package:gymapp_admin/features/plans/data/plan_repository.dart';
-import 'package:gymapp_admin/features/platform/data/platform_repository.dart';
 import 'package:gymapp_admin/features/progress/data/progress_repository.dart';
 import 'package:gymapp_admin/features/trainers/data/trainer_repository.dart';
 import 'package:gymapp_admin/features/trials/data/trial_repository.dart';
@@ -81,9 +80,4 @@ ExpenseRepository expenseRepository(Ref ref) {
 @riverpod
 EquipmentRepository equipmentRepository(Ref ref) {
   return EquipmentRepository(apiClient: ref.watch(apiClientProvider));
-}
-
-@riverpod
-PlatformRepository platformRepository(Ref ref) {
-  return PlatformRepository(apiClient: ref.watch(apiClientProvider));
 }

@@ -28,10 +28,6 @@ const _adminNavKeys = [
 ];
 
 const _roleNavAccess = <String, List<NavKey>>{
-  // super_admin only sees gym-admin nav once it has entered a gym (see
-  // ActingGymHub); the platform (gym directory) screen sits outside this
-  // nav entirely, reached via its own shell.
-  'super_admin': _adminNavKeys,
   'admin': _adminNavKeys,
   'receptionist': [
     NavKey.dashboard,
@@ -49,5 +45,22 @@ bool canAccessNav(String? roleName, NavKey key) {
   return _roleNavAccess[roleName]?.contains(key) ?? false;
 }
 
-/// Roles this app accepts at login. Member accounts must use the member app.
-const staffRoleNames = ['super_admin', 'admin', 'receptionist', 'trainer'];
+/// Roles this app accepts at login. Member accounts must use the member app;
+/// the platform owner (super_admin) must use the web dashboard.
+const staffRoleNames = ['admin', 'receptionist', 'trainer'];
+
+/// Write actions gated beyond "can see the screen". Mirrors the backend
+/// FormRequest authorize() checks (StoreMemberRequest,
+/// RenewMembershipRequest) — a trainer can view members but not add or
+/// renew them.
+enum StaffAction { createMember, renewMembership }
+
+const _actionRoles = <StaffAction, List<String>>{
+  StaffAction.createMember: ['admin', 'receptionist'],
+  StaffAction.renewMembership: ['admin', 'receptionist'],
+};
+
+bool canPerform(String? roleName, StaffAction action) {
+  if (roleName == null) return false;
+  return _actionRoles[action]?.contains(roleName) ?? false;
+}

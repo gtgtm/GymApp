@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:gymapp_admin/core/permissions/nav_permissions.dart';
 import 'package:gymapp_admin/core/widgets/app_list_card.dart';
 import 'package:gymapp_admin/core/widgets/async_value_view.dart';
 import 'package:gymapp_admin/core/widgets/empty_state.dart';
+import 'package:gymapp_admin/features/auth/presentation/acting_gym_controller.dart';
 import 'package:gymapp_admin/features/members/domain/member_models.dart';
 import 'package:gymapp_admin/features/members/presentation/create_member_sheet.dart';
 import 'package:gymapp_admin/features/members/presentation/expiry_badge.dart';
@@ -40,7 +42,11 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.openCreateOnLoad) {
+    final canCreate = canPerform(
+      ref.read(actingRoleNameProvider),
+      StaffAction.createMember,
+    );
+    if (widget.openCreateOnLoad && canCreate) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) showCreateMemberSheet(context);
       });
@@ -72,12 +78,18 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
   @override
   Widget build(BuildContext context) {
     final membersAsync = ref.watch(memberListProvider(_search));
+    final canCreate = canPerform(
+      ref.watch(actingRoleNameProvider),
+      StaffAction.createMember,
+    );
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showCreateMemberSheet(context),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: canCreate
+          ? FloatingActionButton(
+              onPressed: () => showCreateMemberSheet(context),
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -8,12 +8,10 @@ import 'package:gymapp_admin/core/widgets/empty_state.dart';
 import 'package:gymapp_admin/features/auth/domain/gym_membership.dart';
 import 'package:gymapp_admin/features/auth/presentation/auth_controller.dart';
 import 'package:gymapp_admin/features/auth/presentation/my_gyms_providers.dart';
-import 'package:gymapp_admin/features/platform/presentation/acting_gym_controller.dart';
+import 'package:gymapp_admin/features/auth/presentation/acting_gym_controller.dart';
 
-/// Picker for a regular (non-super_admin) multi-gym login: which of their
-/// OWN memberships to act as. Distinct from GymsScreen, which is the
-/// super_admin's cross-tenant gym directory — this only ever shows gyms
-/// this specific login actually belongs to.
+/// Picker for a multi-gym login: which of their OWN memberships to act as.
+/// Only ever shows gyms this specific login actually belongs to.
 class MyGymsScreen extends ConsumerWidget {
   const MyGymsScreen({super.key});
 
