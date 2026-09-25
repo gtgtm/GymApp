@@ -123,7 +123,7 @@ export default function PlatformDashboardPage() {
                 {attentionGyms.map((gym) => (
                   <Link
                     key={gym.id}
-                    href={`/gyms/${gym.id}`}
+                    href={`/gyms/view?id=${gym.id}`}
                     className="flex items-center justify-between gap-3 rounded-md px-2 py-2.5 text-sm transition-colors hover:bg-muted"
                   >
                     <div className="min-w-0">

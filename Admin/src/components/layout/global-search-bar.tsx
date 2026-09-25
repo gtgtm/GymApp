@@ -49,7 +49,7 @@ export function GlobalSearchBar() {
                   {results.members.map((member) => (
                     <Link
                       key={member.id}
-                      href={`/members/${member.id}`}
+                      href={`/members/view?id=${member.id}`}
                       className="block rounded-md px-2 py-1.5 text-sm hover:bg-muted"
                     >
                       <span className="font-medium">{member.full_name}</span>

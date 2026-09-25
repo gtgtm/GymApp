@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { useSearchParams } from "next/navigation";
 import { useMember } from "@/hooks/use-members";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,8 +13,8 @@ import { MemberWorkoutTab } from "@/components/members/member-workout-tab";
 import { MemberDietTab } from "@/components/members/member-diet-tab";
 import { MemberProgressTab } from "@/components/members/member-progress-tab";
 
-export default function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function MemberDetailPage() {
+  const id = useSearchParams().get("id");
   const memberId = Number(id);
   const { data: member, isLoading } = useMember(memberId);
 

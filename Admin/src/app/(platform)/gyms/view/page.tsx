@@ -1,8 +1,7 @@
 "use client";
 
-import { use } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Users, UserCheck, IndianRupee, LogIn } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,8 +21,8 @@ const PAYMENT_STATUS_VARIANT = {
   cancelled: "secondary",
 } as const;
 
-export default function GymDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function GymDetailPage() {
+  const id = useSearchParams().get("id");
   const gymId = Number(id);
   const router = useRouter();
   const { enterGym } = useAuth();

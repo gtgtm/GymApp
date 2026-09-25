@@ -1,0 +1,20 @@
+# Static export served from public_html/gautamgupta.in/gymbrain
+Options -Indexes -MultiViews
+DirectoryIndex index.html
+
+# Unknown routes render the exported 404 page.
+ErrorDocument 404 /gymbrain/404.html
+
+<IfModule mod_headers.c>
+    # Hashed build assets never change; HTML must always be revalidated
+    # so a new deploy is picked up immediately.
+    <FilesMatch "\.(js|css|woff2?|png|jpg|svg|ico)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(html|txt)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

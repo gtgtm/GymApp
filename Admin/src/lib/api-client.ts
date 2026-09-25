@@ -34,11 +34,27 @@ apiClient.interceptors.response.use(
       clearStoredToken();
       // Full reload (not router.push) is intentional: this runs outside React
       // and must also reset all in-memory query cache/state after auth failure.
-      window.location.assign("/login");
+      window.location.assign(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/login/`);
     }
     return Promise.reject(error);
   },
 );
+
+interface ApiErrorBody {
+  message?: string;
+  error?: { message?: string } | null;
+}
+
+// The API answers either with its { error: { message } } envelope or, for
+// Laravel validation exceptions, a top-level { message }.
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (axios.isAxiosError<ApiErrorBody>(error)) {
+    const body = error.response?.data;
+    return body?.error?.message ?? body?.message ?? fallback;
+  }
+
+  return fallback;
+}
 
 export function getStoredToken(): string | null {
   if (typeof window === "undefined") return null;

@@ -105,7 +105,7 @@ export default function SubscriptionsPage() {
                 <TableRow key={subscription.id}>
                   <TableCell className="font-medium">
                     {subscription.gym ? (
-                      <Link href={`/gyms/${subscription.gym.id}`} className="hover:underline">
+                      <Link href={`/gyms/view?id=${subscription.gym.id}`} className="hover:underline">
                         {subscription.gym.name}
                       </Link>
                     ) : (

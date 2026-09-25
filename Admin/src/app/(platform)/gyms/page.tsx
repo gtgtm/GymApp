@@ -97,7 +97,7 @@ export default function GymsPage() {
               {gyms.map((gym) => (
                 <TableRow key={gym.id}>
                   <TableCell className="font-medium">
-                    <Link href={`/gyms/${gym.id}`} className="hover:underline">
+                    <Link href={`/gyms/view?id=${gym.id}`} className="hover:underline">
                       {gym.name}
                     </Link>
                   </TableCell>
@@ -138,7 +138,7 @@ export default function GymsPage() {
                         size="icon-sm"
                         title="Details"
                         nativeButton={false}
-                        render={<Link href={`/gyms/${gym.id}`} />}
+                        render={<Link href={`/gyms/view?id=${gym.id}`} />}
                       >
                         <Eye className="h-3.5 w-3.5" />
                       </Button>

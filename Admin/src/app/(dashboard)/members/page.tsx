@@ -64,7 +64,7 @@ export default function MembersPage() {
             {data?.data.map((member) => (
               <TableRow key={member.id}>
                 <TableCell>
-                  <Link href={`/members/${member.id}`} className="font-medium hover:underline">
+                  <Link href={`/members/view?id=${member.id}`} className="font-medium hover:underline">
                     {member.full_name}
                   </Link>
                   <p className="text-xs text-muted-foreground">{member.member_code}</p>
