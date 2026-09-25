@@ -1,0 +1,27 @@
+# Used only when the app root itself is web-reachable (shared hosting).
+# Every request goes through index.php; only public assets are served
+# directly, so .env, vendor/, storage/ etc. are never exposed.
+
+Options -Indexes -MultiViews
+
+# Fallback protection in case mod_rewrite is unavailable.
+<FilesMatch "^(\.env.*|\.git.*|artisan|composer\.(json|lock)|package\.json|phpunit\.xml|.*\.(md|log|sql|sh))$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Pass the Authorization header through to PHP (Sanctum bearer tokens).
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Front controller: stop here once rewritten.
+    RewriteRule ^index\.php$ - [L]
+
+    # Public files (uploaded progress photos, favicon, robots.txt).
+    RewriteRule ^(storage/.+|favicon\.ico|robots\.txt)$ public/$1 [L]
+
+    # Everything else, including direct hits on app files, goes to Laravel.
+    RewriteRule ^ index.php [L]
+</IfModule>

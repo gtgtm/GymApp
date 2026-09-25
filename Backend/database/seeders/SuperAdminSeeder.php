@@ -14,7 +14,7 @@ class SuperAdminSeeder extends Seeder
         $superAdminRoleId = Role::query()->where('name', Role::SUPER_ADMIN)->value('id');
 
         User::query()->updateOrCreate(
-            ['email' => 'superadmin@gymapp.test'],
+            ['email' => 'superadmin@gmail.com'],
             [
                 'role_id' => $superAdminRoleId,
                 'name' => 'Platform Owner',
