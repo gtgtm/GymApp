@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { LogOut, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,8 +11,15 @@ import { useAuth } from "@/hooks/use-auth";
 import { PlatformSidebar } from "@/components/layout/platform-sidebar";
 import { PlatformMobileNavDrawer } from "@/components/layout/platform-mobile-nav-drawer";
 
+// Client-only, like NotificationBell: base-ui's Dialog module can't be
+// evaluated during the static-export prerender.
+const LogoutButton = dynamic(
+  () => import("@/components/layout/logout-button").then((mod) => mod.LogoutButton),
+  { ssr: false },
+);
+
 export default function PlatformLayout({ children }: { children: ReactNode }) {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -71,9 +79,7 @@ export default function PlatformLayout({ children }: { children: ReactNode }) {
             <Avatar>
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
-            <Button variant="ghost" size="icon" onClick={() => void logout()} title="Log out">
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <LogoutButton />
           </div>
         </header>
         <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6">

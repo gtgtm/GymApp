@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { LogOut, Menu, Store } from "lucide-react";
+import { Menu, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,8 +15,15 @@ const NotificationBell = dynamic(
   { ssr: false },
 );
 
+// Client-only, like NotificationBell: base-ui's Dialog module can't be
+// evaluated during the static-export prerender.
+const LogoutButton = dynamic(
+  () => import("@/components/layout/logout-button").then((mod) => mod.LogoutButton),
+  { ssr: false },
+);
+
 export function Topbar() {
-  const { user, logout, actingGym, exitGym } = useAuth();
+  const { user, actingGym, exitGym } = useAuth();
   const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const isSuperAdmin = user?.role.name === "super_admin";
@@ -75,9 +82,7 @@ export function Topbar() {
         <Avatar>
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
-        <Button variant="ghost" size="icon" onClick={() => void logout()} title="Log out">
-          <LogOut className="h-4 w-4" />
-        </Button>
+        <LogoutButton />
       </div>
     </header>
   );
