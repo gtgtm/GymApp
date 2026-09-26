@@ -6,7 +6,9 @@ import 'package:gymapp_admin/core/auth/token_storage.dart';
 /// Compile-time configurable API base URL.
 /// Override at build/run time with:
 ///   flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000/api/v1
-const _defaultBaseUrl = 'http://127.0.0.1:8000/api/v1';
+// const _defaultBaseUrl = 'http://127.0.0.1:8000/api/v1';
+
+const _defaultBaseUrl = 'https://gautamgupta.in/gymbrainapi/api/v1';
 const apiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
   defaultValue: _defaultBaseUrl,
